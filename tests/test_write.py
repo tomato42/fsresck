@@ -64,3 +64,10 @@ class TestWrite(unittest.TestCase):
         write2 = None
 
         self.assertNotEqual(write1, write2)
+
+    def test___str__(self):
+        write = Write(lba=512, data=bytearray(65536))
+
+        self.assertEqual("<Write lba=512, len(data)=65536, disk_id=None, "\
+                         "start_time=None, end_time=None>",
+                         str(write))

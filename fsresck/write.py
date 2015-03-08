@@ -44,6 +44,14 @@ class Write(object):
         self.start_time = None
         self.end_time = None
 
+    def __str__(self):
+        """
+        Return human-readable representation of the object
+        """
+        return "<Write lba={0}, len(data)={1}, disk_id={2}, start_time={3}, "\
+               "end_time={4}>".format(self.lba, len(self.data), self.disk_id,
+                                      self.start_time, self.end_time)
+
     def set_times(self, start_time, end_time):
         """
         Add the issuence time and completion time of original operation

@@ -44,7 +44,7 @@ class Write(object):
         self.start_time = None
         self.end_time = None
 
-    def __str__(self):
+    def __repr__(self):
         """
         Return human-readable representation of the object
         """

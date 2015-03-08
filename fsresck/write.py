@@ -23,9 +23,21 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""Handling of image modification requests (writes)"""
 
 class Write(object):
+    """Single image modification request"""
     def __init__(self, lba, data, disk_id=None):
+        """
+        Create an object instance
+
+        @type lba: int
+        @param lab: the start place for the write modification request
+        @type data: bytearray
+        @param data: data to write at L{lba}
+        @param disk_id: base image disk UUID
+        """
+
         self.lba = lba
         self.data = data
         self.disk_id = disk_id
@@ -33,10 +45,17 @@ class Write(object):
         self.end_time = None
 
     def set_times(self, start_time, end_time):
+        """
+        Add the issuence time and completion time of original operation
+        """
         self.start_time = start_time
         self.end_time = end_time
 
     def __eq__(self, other):
+        """
+        Compare the object with another to check if it representes the
+        same modification.
+        """
         if not isinstance(other, Write):
             return False
 

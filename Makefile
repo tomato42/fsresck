@@ -1,0 +1,15 @@
+PYTHON2 := $(shell which python2 2>/dev/null)
+PYTHON3 := $(shell which python3 2>/dev/null)
+
+test:
+ifdef PYTHON2
+	python2 -m unittest discover -v
+endif
+ifdef PYTHON3
+	python3 -m unittest discover -v
+endif
+ifndef PYTHON2
+ifndef PYTHON3
+	python -m unittest discover -v
+endif
+endif

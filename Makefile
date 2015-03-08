@@ -1,6 +1,12 @@
 PYTHON2 := $(shell which python2 2>/dev/null)
 PYTHON3 := $(shell which python3 2>/dev/null)
 
+clean:
+	rm -rf tests/*.pyc
+	rm -rf tests/__pycache__/
+	rm -rf fsresck/*.pyc
+	rm -rf fsresck/__pycache__/
+
 test:
 ifdef PYTHON2
 	python2 -m unittest discover -v

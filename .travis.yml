@@ -21,7 +21,12 @@ install:
   - travis_retry pip install -r build-requirements.txt
 
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then unit2 discover; else python -m unittest discover; fi
+  - |
+      if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then
+          coverage run --branch --source fsresck -m unittest2 discover;
+      else
+          coverage run --branch --source fsresck -m unittest discover;
+      fi
   # pylint doesn't work on 2.6: https://bitbucket.org/logilab/pylint/issue/390/py26-compatiblity-broken
   # diff-quality doesn't work on 3.2: https://github.com/edx/diff-cover/issues/94
   - |
@@ -42,5 +47,8 @@ script:
         fi
         cd $TRAVIS_BUILD_DIR
       done
+
+after_success:
+  - coveralls
 
 sudo: false

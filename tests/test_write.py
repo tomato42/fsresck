@@ -51,19 +51,19 @@ class TestWrite(unittest.TestCase):
         write1 = Write(None, None)
         write2 = Write(None, None)
 
-        self.assertEqual(write1, write2)
+        self.assertTrue(write1 == write2)
 
     def test___eq___with_different_writes(self):
         write1 = Write(0, bytearray(512))
         write2 = Write(0, bytearray(1024))
 
-        self.assertNotEqual(write1, write2)
+        self.assertFalse(write1 == write2)
 
     def test___eq__with_non_Write_other(self):
         write1 = Write(0, bytearray(512))
         write2 = None
 
-        self.assertNotEqual(write1, write2)
+        self.assertFalse(write1 == write2)
 
     def test___str__(self):
         write = Write(lba=512, data=bytearray(65536))
@@ -71,3 +71,11 @@ class TestWrite(unittest.TestCase):
         self.assertEqual("<Write lba=512, len(data)=65536, disk_id=None, "\
                          "start_time=None, end_time=None>",
                          str(write))
+
+    def test_set_times(self):
+        write = Write(lba=0, data=bytearray(65536))
+
+        write.set_times(12, 14)
+
+        self.assertEqual(write.start_time, 12)
+        self.assertEqual(write.end_time, 14)

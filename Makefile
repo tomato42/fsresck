@@ -7,6 +7,10 @@ clean:
 	rm -rf fsresck/*.pyc
 	rm -rf fsresck/__pycache__/
 
+test-dev: test
+	coverage run --branch --source fsresck -m unittest discover
+	coverage report -m
+
 test:
 ifdef PYTHON2
 	python2 -m unittest discover -v

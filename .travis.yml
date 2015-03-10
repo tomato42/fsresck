@@ -22,7 +22,6 @@ install:
 
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then unit2 discover; else python -m unittest discover; fi
-  - make test
   # pylint doesn't work on 2.6: https://bitbucket.org/logilab/pylint/issue/390/py26-compatiblity-broken
   # diff-quality doesn't work on 3.2: https://github.com/edx/diff-cover/issues/94
   - |
@@ -41,7 +40,6 @@ script:
         else
           python -m unittest discover || exit 1
         fi
-        make test || exit 1
         cd $TRAVIS_BUILD_DIR
       done
 

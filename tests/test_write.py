@@ -66,11 +66,22 @@ class TestWrite(unittest.TestCase):
         self.assertFalse(write1 == write2)
 
     def test___str__(self):
-        write = Write(lba=512, data=bytearray(65536))
+        write = Write(lba=512, data=bytearray(65536), disk_id=1234)
+        write.set_times(33, 22)
 
-        self.assertEqual("<Write lba=512, len(data)=65536, disk_id=None, "\
-                         "start_time=None, end_time=None>",
+        self.assertEqual("<Write lba=512, len(data)=65536, disk_id=1234, "\
+                         "start_time=33, end_time=22>",
                          str(write))
+
+    def test___repr___with_just_lba_and_data(self):
+        write = Write(lba=512, data=bytearray(1024))
+
+        self.assertEqual("<Write lba=512, len(data)=1024>", repr(write))
+
+    def test___repr___with_just_lba_data_and_disk_id(self):
+        write = Write(lba=1, data=bytearray(2), disk_id=3)
+
+        self.assertEqual("<Write lba=1, len(data)=2, disk_id=3>", repr(write))
 
     def test_set_times(self):
         write = Write(lba=0, data=bytearray(65536))

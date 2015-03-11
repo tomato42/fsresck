@@ -48,9 +48,18 @@ class Write(object):
         """
         Return human-readable representation of the object
         """
-        return "<Write lba={0}, len(data)={1}, disk_id={2}, start_time={3}, "\
-               "end_time={4}>".format(self.lba, len(self.data), self.disk_id,
-                                      self.start_time, self.end_time)
+        if self.disk_id is None and self.start_time is None and \
+                self.end_time is None:
+            return "<Write lba={0}, len(data)={1}>".format(
+                    self.lba, len(self.data))
+        elif self.start_time is None and self.end_time is None:
+            return "<Write lba={0}, len(data)={1}, disk_id={2}>".format(
+                    self.lba, len(self.data), self.disk_id)
+        else:
+            return "<Write lba={0}, len(data)={1}, disk_id={2}, "\
+                   "start_time={3}, end_time={4}>".format(
+                           self.lba, len(self.data), self.disk_id,
+                           self.start_time, self.end_time)
 
     def set_times(self, start_time, end_time):
         """

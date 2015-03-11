@@ -23,3 +23,5 @@ ifndef PYTHON3
 	python -m unittest discover -v
 endif
 endif
+	coverage run --branch --source fsresck -m unittest discover
+	coverage report -m

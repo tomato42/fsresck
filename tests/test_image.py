@@ -97,7 +97,7 @@ class TestImage(unittest.TestCase):
 
         patcher = mock.patch.object(subprocess,
                                     'call',
-                                    mock.create_autospec(os.close,
+                                    mock.create_autospec(subprocess.call,
                                                          return_value=0))
         mock_call = patcher.start()
         self.addCleanup(patcher.stop)

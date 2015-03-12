@@ -7,6 +7,10 @@ python:
   - 3.3
   - 3.4
 
+branches:
+  only:
+    - master
+
 before_install:
   - |
        # workaround https://github.com/travis-ci/travis-ci/issues/2666

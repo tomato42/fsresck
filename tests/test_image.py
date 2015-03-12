@@ -91,7 +91,7 @@ class TestImage(unittest.TestCase):
 
         patcher = mock.patch.object(os,
                                     'close',
-                                    mock.create_autospec(os.close))
+                                    mock.MagicMock())
         mock_close = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -104,7 +104,7 @@ class TestImage(unittest.TestCase):
 
         patcher = mock.patch.object(os,
                                     'unlink',
-                                    mock.create_autospec(os.unlink))
+                                    mock.MagicMock())
         mock_unlink = patcher.start()
         self.addCleanup(patcher.stop)
                                                         

@@ -24,15 +24,30 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+"""
+Helper methods for creating non-repeating permutations of images
+"""
+
 from .image import Image
 
 import random
+from itertools import permutations
+import collections
 
 class WritesShuffler(object):
+    """
+    Generator that takes an image, set of writes and generates permutations
+    of images and writes to test
+    """
     def __init__(self, base_image, writes):
+        """
+        Provide the image that will create the base for the tests and the
+        writes that should get tested.
+        """
         self.base_image = base_image
         self.writes = writes
 
+    # TODO random permutation of writes (statistical generator)
     def generator(self):
         """
         Iterator that returns pairs of images and logs of writes that are
@@ -40,15 +55,21 @@ class WritesShuffler(object):
         """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
+        if not isinstance(self.writes, collections.Iterable):
+            raise TypeError("'writes' must be iterable")
 
         image = self.base_image.create_image("/tmp")
+
         for i in range(len(self.writes)-1, -1, -1):
             image_writes = self.writes[:i]
-            writes = self.writes[:i]
+            writes = self.writes[i:]
 
-            # TODO all permutations of writes
-            # TODO random permutation of writes (statistical generator)
+            if len(writes) == 1:
+                yield (Image(image, image_writes), tuple())
+                continue
 
-            random.shuffle(writes)
-
-            yield (Image(image, image_writes), writes)
+            for perm in permutations(writes):
+                # skip permutations where the first element is in order
+                if perm[0] == writes[0]:
+                    continue
+                yield (Image(image, image_writes), perm)

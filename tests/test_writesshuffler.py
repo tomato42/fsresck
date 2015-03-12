@@ -44,24 +44,27 @@ class TestWritesShuffler(unittest.TestCase):
     def test_generator(self):
         image = Image("/dev/null", [])
         # mock the object to not create an image copy
-        image.create_image = lambda x: "/dev/null"
+        image.create_image = lambda x: "/tmp/some-name"
         writes = [
             Write(lba=0, data=bytearray(512)),
             ]
 
         ws = WritesShuffler(image, writes)
-        tests = [i for i in ws.generator()]
+        tests = list(ws.generator())
         self.assertEqual(len(tests), 1)
         self.assertEqual(len(tests[0]), 2)
         image, writes = tests[0]
-        # XXX this should be random name in directory specified in
-        # WritesShuffler generator
-        self.assertEqual(image.image_name, "/dev/null")
+        self.assertEqual(image.image_name, "/tmp/some-name")
         self.assertEqual(image.writes, [])
-        self.assertEqual(writes, [])
+        self.assertEqual(writes, tuple())
 
     def test_generator_with_invalid_data(self):
-        ws = WritesShuffler(None, None)
+        ws = WritesShuffler(None, [])
+
+        with self.assertRaises(TypeError):
+            next(ws.generator())
+
+        ws = WritesShuffler('/dev/null', None)
 
         with self.assertRaises(TypeError):
             next(ws.generator())
@@ -69,7 +72,7 @@ class TestWritesShuffler(unittest.TestCase):
     def test_generator_with_many_writes(self):
         image = Image("/dev/null", [])
         # mock the object to not create an image copy
-        image.create_image = lambda x: "/dev/null"
+        image.create_image = lambda x: "/tmp/some-name"
         writes = [
             Write(lba=0, data=bytearray(512)),
             Write(lba=512, data=bytearray(512)),
@@ -77,12 +80,38 @@ class TestWritesShuffler(unittest.TestCase):
             ]
 
         ws = WritesShuffler(image, writes)
-        tests = [i for i in ws.generator()]
-        self.assertEqual(len(tests), 3)
+
+        tests = list(ws.generator())
+
+        self.assertEqual(len(tests), 6)
         self.assertEqual(len(tests[0]), 2)
-        image, writes = tests[0]
-        # XXX this should be random name in directory specified in
-        # WritesShuffler generator
-        self.assertEqual(image.image_name, "/dev/null")
-        self.maxDiff = None
-        # XXX verify the writes are corrct sizes
+
+        test_image, test_writes = tests[0]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0], writes[1]])
+        self.assertEqual(test_writes, tuple())
+
+        test_image, test_writes = tests[1]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[2], writes[1]))
+
+        test_image, test_writes = tests[2]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[0], writes[2]))
+
+        test_image, test_writes = tests[3]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[2], writes[0]))
+
+        test_image, test_writes = tests[4]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[2], writes[0], writes[1]))
+
+        test_image, test_writes = tests[5]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[2], writes[1], writes[0]))

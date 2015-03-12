@@ -23,25 +23,43 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+Disk image handlers
+"""
 
 import os
 import tempfile
 import subprocess
 
 class Image(object):
+    """
+    Object for keeping disk image (in form of a file) together with writes
+    to modify it, methods to apply those writes to temporary file and cleanup
+    after the temporary file is no longer useful (or was modified).
+    """
     def __init__(self, image_name, writes):
+        """
+        Combine disk file image with writes
+        """
         self.image_name = image_name
         self.writes = writes
         self.temp_image_name = None
 
     def __repr__(self):
+        """
+        Return human readable representation of object
+        """
         if self.temp_image_name is not None:
             return "Image(image_name={0!r}, writes=[])"\
                     .format(self.temp_image_name)
         return "Image(image_name={0!r}, writes={1!r})".format(self.image_name,
-                                                          self.writes)
+                                                              self.writes)
 
     def create_image(self, path):
+        """
+        Copy the base image to temporary file in 'path', apply writes to it
+        and return its name.
+        """
         if self.temp_image_name is None:
             # create a temp file in directory path
             handle, self.temp_image_name = tempfile.mkstemp(prefix='fsresck.',
@@ -66,5 +84,9 @@ class Image(object):
         return self.temp_image_name
 
     def cleanup(self):
+        """
+        Remove the temporary image name, make it possible to create a new
+        temporary copy with appplied writes
+        """
         os.unlink(self.temp_image_name)
         self.temp_image_name = None

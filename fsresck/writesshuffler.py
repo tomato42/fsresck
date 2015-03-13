@@ -59,9 +59,7 @@ class WritesShuffler(object):
         self._cleanup_image = None
 
     def shuffle(self):
-        """
-        Return a random permutation of writes with the image
-        """
+        """ Return a random permutation of writes with the image """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
         if not isinstance(self.writes, collections.Iterable):
@@ -107,7 +105,5 @@ class WritesShuffler(object):
                 yield (Image(image, image_writes), perm)
 
     def cleanup(self):
-        """"
-        Remove the temporary image created by generator and shuffle
-        """
+        """ Remove the temporary image created by generator and shuffle """
         os.unlink(self._cleanup_image)

@@ -31,6 +31,13 @@ try:
 except ImportError:
         import unittest
 
+try:
+    import mock
+except ImportError:
+    import unittest.mock as mock
+
+import os
+
 from fsresck.writesshuffler import WritesShuffler
 from fsresck.image import Image
 from fsresck.write import Write
@@ -115,3 +122,70 @@ class TestWritesShuffler(unittest.TestCase):
         self.assertEqual(test_image.image_name, "/tmp/some-name")
         self.assertEqual(test_image.writes, [])
         self.assertEqual(test_writes, (writes[2], writes[1], writes[0]))
+
+    def test_cleanup(self):
+        image = Image("/dev/null", [])
+        image.create_image = lambda x: "/tmp/some-name"
+
+        writes = [
+            Write(lba=0, data=bytearray(1)),
+            Write(lba=1, data=bytearray(1)),
+            Write(lba=2, data=bytearray(1))
+            ]
+        ws = WritesShuffler(image, writes)
+        next(ws.generator())
+
+        patcher = mock.patch.object(os,
+                                    'unlink',
+                                    mock.MagicMock())
+        os_unlink = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        ws.cleanup()
+
+        self.assertEqual(os_unlink.call_count, 1)
+        self.assertEqual(os_unlink.call_args, mock.call("/tmp/some-name"))
+
+    def test_shuffle_with_bad_image(self):
+        ws = WritesShuffler(None, [])
+
+        with self.assertRaises(TypeError):
+            next(ws.shuffle())
+
+    def test_shuffle_with_bad_writes(self):
+        ws = WritesShuffler("/tmp/test", 22)
+
+        with self.assertRaises(TypeError):
+            next(ws.shuffle())
+
+    def test_shuffle(self):
+
+        image = Image("/tmp/test", [])
+        image.create_image = lambda x: "/tmp/some-name"
+
+        writes = [
+            Write(lba=0, data=bytearray(1)),
+            Write(lba=1, data=bytearray(1)),
+            Write(lba=2, data=bytearray(1)),
+            ]
+        ws = WritesShuffler(image, writes)
+
+        test_image, test_writes = next(ws.shuffle())
+
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(len(test_writes), 3)
+        self.assertNotEqual(test_writes[0], writes[0])
+
+    def test_shuffle_multiple_times(self):
+        image = Image("/tmp/test", [])
+        image.create_image = lambda x: "/tmp/some-name"
+
+        writes = [
+            Write(lba=0, data=bytearray(1)),
+            Write(lba=1, data=bytearray(1)),
+            ]
+        ws = WritesShuffler(image, writes)
+
+        for i in range(10):
+            test_image, test_writes = next(ws.shuffle())
+            self.assertNotEqual(test_writes[0], writes[0])

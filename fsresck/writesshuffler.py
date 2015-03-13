@@ -33,23 +33,54 @@ from .image import Image
 import random
 from itertools import permutations
 import collections
+import os
 
 class WritesShuffler(object):
+
     """
+    Generate sets of writes for image files
+
     Generator that takes an image, set of writes and generates permutations
     of images and writes to test
+
+    @todo: parametrise image location
+    @todo: parametrise random source
     """
+
     def __init__(self, base_image, writes):
         """
+        Link image file with writes
+
         Provide the image that will create the base for the tests and the
         writes that should get tested.
         """
         self.base_image = base_image
         self.writes = writes
+        self._cleanup_image = None
 
-    # TODO random permutation of writes (statistical generator)
+    def shuffle(self):
+        """
+        Return a random permutation of writes with the image
+        """
+        if self.base_image is None:
+            raise TypeError("base_image can't be None")
+        if not isinstance(self.writes, collections.Iterable):
+            raise TypeError("'writes' must be iterable")
+
+        image = self.base_image.create_image("/tmp")
+        self._cleanup_image = image
+        while True:
+            writes = self.writes[:]
+            random.shuffle(writes)
+            # skip permutations which have writes in order
+            if writes[0] == self.writes[0]:
+                continue
+            yield (Image(image, []), writes)
+
     def generator(self):
         """
+        Return all permutations of writes on an image
+
         Iterator that returns pairs of images and logs of writes that are
         shuffled in a way that makes them unique
         """
@@ -59,6 +90,7 @@ class WritesShuffler(object):
             raise TypeError("'writes' must be iterable")
 
         image = self.base_image.create_image("/tmp")
+        self._cleanup_image = image
 
         for i in range(len(self.writes)-1, -1, -1):
             image_writes = self.writes[:i]
@@ -73,3 +105,9 @@ class WritesShuffler(object):
                 if perm[0] == writes[0]:
                     continue
                 yield (Image(image, image_writes), perm)
+
+    def cleanup(self):
+        """"
+        Remove the temporary image created by generator and shuffle
+        """
+        os.unlink(self._cleanup_image)

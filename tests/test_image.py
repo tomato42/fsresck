@@ -204,3 +204,124 @@ class TestImage(unittest.TestCase):
                                                          '/tmp/fsresck.xxxx']))
 
         self.assertEqual(mock_unlink.call_count, 0)
+
+    def test_create_image_twice(self):
+        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+
+        # mock setup
+        patcher = mock.patch.object(builtins,
+                                    'open',
+                                    mock.mock_open())
+        mock_open = patcher.start()
+        open_patcher = patcher
+
+        mkstemp = mock.create_autospec(tempfile.mkstemp)
+        mkstemp.return_value = (-33, '/tmp/fsresck.xxxx')
+
+        patcher = mock.patch.object(tempfile,
+                                    'mkstemp',
+                                    mkstemp)
+        mock_mkstemp = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(os,
+                                    'close',
+                                    mock.MagicMock())
+        mock_close = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(subprocess,
+                                    'call',
+                                    mock.create_autospec(subprocess.call,
+                                                         return_value=0))
+        mock_call = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(os,
+                                    'unlink',
+                                    mock.MagicMock())
+        mock_unlink = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        # test
+        image_name = image.create_image('/tmp')
+
+        self.assertEqual('/tmp/fsresck.xxxx', image_name)
+
+        image.cleanup()
+
+        self.assertEqual(None, image.temp_image_name)
+
+        # mock asserts
+        self.assertEqual(mock_open.call_count, 1)
+        self.assertEqual(mock_open.call_args, mock.call('/tmp/fsresck.xxxx',
+                                                        'w+b'))
+        handle = mock_open()
+        self.assertEqual(handle.seek.call_args, mock.call(4))
+        self.assertEqual(handle.write.call_args, mock.call('aa'))
+
+        self.assertEqual(mock_mkstemp.call_count, 1)
+        self.assertEqual(mock_mkstemp.call_args, mock.call(prefix='fsresck.',
+                                                           dir='/tmp'))
+
+        self.assertEqual(mock_close.call_count, 1)
+        self.assertEqual(mock_close.call_args, mock.call(-33))
+
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(mock_call.call_args, mock.call(['cp',
+                                                         '--reflink=auto',
+                                                         '--sparse=always',
+                                                         '/tmp/test.1',
+                                                         '/tmp/fsresck.xxxx']))
+
+        self.assertEqual(mock_unlink.call_count, 1)
+        self.assertEqual(mock_unlink.call_args, mock.call('/tmp/fsresck.xxxx'))
+
+        # make space for second run
+        open_patcher.stop()
+        patcher = mock.patch.object(builtins,
+                                    'open',
+                                    mock.mock_open())
+        mock_open = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        mock_mkstemp.reset_mock()
+        mock_close.reset_mock()
+        mock_call.reset_mock()
+        mock_unlink.reset_mock()
+
+        # change temporary file name
+        mock_mkstemp.return_value = (-33, '/tmp/fsresck.yyyy')
+
+        # test
+        image_name = image.create_image('/tmp')
+
+        self.assertEqual('/tmp/fsresck.yyyy', image_name)
+
+        image.cleanup()
+
+        # check if the second run creates the file with same contents
+        # the second run is to get "handle"
+        self.assertEqual(mock_open.call_count, 1)
+        self.assertEqual(mock_open.call_args, mock.call('/tmp/fsresck.yyyy',
+                                                        'w+b'))
+        handle = mock_open()
+        self.assertEqual(handle.seek.call_args, mock.call(4))
+        self.assertEqual(handle.write.call_args, mock.call('aa'))
+
+        self.assertEqual(mock_mkstemp.call_count, 1)
+        self.assertEqual(mock_mkstemp.call_args, mock.call(prefix='fsresck.',
+                                                           dir='/tmp'))
+
+        self.assertEqual(mock_close.call_count, 1)
+        self.assertEqual(mock_close.call_args, mock.call(-33))
+
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(mock_call.call_args, mock.call(['cp',
+                                                         '--reflink=auto',
+                                                         '--sparse=always',
+                                                         '/tmp/test.1',
+                                                         '/tmp/fsresck.yyyy']))
+
+        self.assertEqual(mock_unlink.call_count, 1)
+        self.assertEqual(mock_unlink.call_args, mock.call('/tmp/fsresck.yyyy'))

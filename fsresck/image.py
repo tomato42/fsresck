@@ -76,7 +76,6 @@ class Image(object):
                 for write in self.writes:
                     image.seek(write.lba)
                     image.write(write.data)
-                self.writes = []
 
         return self.temp_image_name
 

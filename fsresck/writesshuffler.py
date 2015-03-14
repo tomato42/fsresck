@@ -31,7 +31,6 @@ from .image import Image
 import random
 from itertools import permutations
 import collections
-import os
 
 class WritesShuffler(object):
 

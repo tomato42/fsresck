@@ -24,9 +24,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"""
-Helper methods for creating non-repeating permutations of images
-"""
+""" Helper methods for creating non-repeating permutations of images """
 
 from .image import Image
 
@@ -43,7 +41,6 @@ class WritesShuffler(object):
     Generator that takes an image, set of writes and generates permutations
     of images and writes to test
 
-    @todo: parametrise image location
     @todo: parametrise random source
     """
 

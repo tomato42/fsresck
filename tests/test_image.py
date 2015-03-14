@@ -49,6 +49,7 @@ import tempfile
 import subprocess
 from fsresck.image import Image
 from fsresck.write import Write
+from fsresck.errors import FSCopyError
 
 class TestImage(unittest.TestCase):
     def test___init__(self):
@@ -82,7 +83,7 @@ class TestImage(unittest.TestCase):
 
         mkstemp = mock.create_autospec(tempfile.mkstemp)
         mkstemp.return_value = (-33, '/tmp/fsresck.xxxx')
-        
+
         patcher = mock.patch.object(tempfile,
                                     'mkstemp',
                                     mkstemp)
@@ -107,11 +108,13 @@ class TestImage(unittest.TestCase):
                                     mock.MagicMock())
         mock_unlink = patcher.start()
         self.addCleanup(patcher.stop)
-                                                        
+
         # test
         image_name = image.create_image('/tmp')
+
         self.assertEqual('/tmp/fsresck.xxxx', image_name)
-        
+        self.assertEqual(image_name, image.create_image("/tmp"))
+
         image.cleanup()
 
         self.assertEqual(None, image.temp_image_name)
@@ -140,3 +143,64 @@ class TestImage(unittest.TestCase):
 
         self.assertEqual(mock_unlink.call_count, 1)
         self.assertEqual(mock_unlink.call_args, mock.call('/tmp/fsresck.xxxx'))
+
+    def test_create_image_with_failed_copy(self):
+        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+
+        # mock setup
+        patcher = mock.patch.object(builtins,
+                                    'open',
+                                    mock.mock_open())
+        mock_open = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        mkstemp = mock.create_autospec(tempfile.mkstemp)
+        mkstemp.return_value = (-33, '/tmp/fsresck.xxxx')
+
+        patcher = mock.patch.object(tempfile,
+                                    'mkstemp',
+                                    mkstemp)
+        mock_mkstemp = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(os,
+                                    'close',
+                                    mock.MagicMock())
+        mock_close = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(subprocess,
+                                    'call',
+                                    mock.create_autospec(subprocess.call,
+                                                         return_value=1))
+        mock_call = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(os,
+                                    'unlink',
+                                    mock.MagicMock())
+        mock_unlink = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        # test
+        with self.assertRaises(FSCopyError):
+            image.create_image('/tmp')
+
+        # mock asserts
+        self.assertEqual(mock_open.call_count, 0)
+
+        self.assertEqual(mock_mkstemp.call_count, 1)
+        self.assertEqual(mock_mkstemp.call_args, mock.call(prefix='fsresck.',
+                                                           dir='/tmp'))
+
+        self.assertEqual(mock_close.call_count, 1)
+        self.assertEqual(mock_close.call_args, mock.call(-33))
+
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(mock_call.call_args, mock.call(['cp',
+                                                         '--reflink=auto',
+                                                         '--sparse=always',
+                                                         '/tmp/test.1',
+                                                         '/tmp/fsresck.xxxx']))
+
+        self.assertEqual(mock_unlink.call_count, 0)

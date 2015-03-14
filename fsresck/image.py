@@ -67,9 +67,7 @@ class Image(object):
                                                             dir=path)
             os.close(handle)
 
-            ret = utils.copy(self.image_name, self.temp_image_name)
-            if ret != 0:
-                raise FSCopyError("Copy failed, error: {0}".format(ret))
+            utils.copy(self.image_name, self.temp_image_name)
 
             # apply writes to the copied image
             with open(self.temp_image_name, "w+b") as image:

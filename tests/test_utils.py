@@ -39,9 +39,10 @@ except ImportError:
 
 import subprocess
 from fsresck.utils import copy
+from fsresck.errors import FSCopyError
 
 class TestCopy(unittest.TestCase):
-    def test_copy(self):
+    def test_copy_with_error(self):
 
         patcher = mock.patch.object(subprocess,
                                     'call',
@@ -49,9 +50,18 @@ class TestCopy(unittest.TestCase):
         mock_call = patcher.start()
         self.addCleanup(patcher.stop)
 
-        ret = copy("file-A", "file-B")
+        with self.assertRaises(FSCopyError):
+            copy("file-A", "file-B")
 
-        self.assertEqual(ret, 3)
+    def test_copy(self):
+        patcher = mock.patch.object(subprocess,
+                                    'call',
+                                    mock.MagicMock(return_value=0))
+        mock_call = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        copy("file-A", "file-B")
+
         self.assertEqual(1, mock_call.call_count)
         self.assertEqual("file-A", mock_call.call_args[0][0][-2])
         self.assertEqual("file-B", mock_call.call_args[0][0][-1])

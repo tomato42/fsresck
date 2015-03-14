@@ -31,7 +31,6 @@ from .image import Image
 import random
 from itertools import permutations
 import collections
-import os
 
 class WritesShuffler(object):
 
@@ -53,7 +52,6 @@ class WritesShuffler(object):
         """
         self.base_image = base_image
         self.writes = writes
-        self._cleanup_image = None
         self.image_dir = "/tmp"
 
     def shuffle(self):
@@ -64,7 +62,7 @@ class WritesShuffler(object):
             raise TypeError("'writes' must be iterable")
 
         image = self.base_image.create_image(self.image_dir)
-        self._cleanup_image = image
+
         while True:
             writes = self.writes[:]
             random.shuffle(writes)
@@ -86,7 +84,6 @@ class WritesShuffler(object):
             raise TypeError("'writes' must be iterable")
 
         image = self.base_image.create_image(self.image_dir)
-        self._cleanup_image = image
 
         for i in range(len(self.writes)-1, -1, -1):
             image_writes = self.writes[:i]
@@ -104,4 +101,4 @@ class WritesShuffler(object):
 
     def cleanup(self):
         """ Remove the temporary image created by generator and shuffle """
-        os.unlink(self._cleanup_image)
+        self.base_image.cleanup()

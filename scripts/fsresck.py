@@ -1,4 +1,7 @@
+#!/usr/bin/python
 
+from fsresck.fragmenter import Fragmenter
+from fsresck.writesshuffler import WritesShuffler
 
 def main():
 
@@ -8,24 +11,31 @@ def main():
         fragmenter = Fragmenter(sector_size=512)
         writes = fragmenter.fragment(writes)
 
-        # shuffler starts from end, first creates a image without
-        # last write, then without 2 writes with two writes swapped
-        # then image without 3 writes and shuffled_writes and then
-        # permutations of writes excluding writes in order or with first
-        # write being in order
-        for image, shuffled_writes in writesShuffler(base_image, writes):
+        # generate permutations of writes to apply to image
+        shuffler = WritesShuffler(base_image, writes)
 
-            # create image file
+        for image, shuffled_writes in shuffler.generator():
 
-            # copy image to temp_image
-            # test temp_image
+            temp_image = image.create_image()
+
+            # copy temp_image to test_image
+
+            # test test_image
+
+            # remove test_image
 
             for write in shuffled_writes:
-                # copy image to temp_image
-                # damage write and write it to temp_image
-                # test temp_image
+                # apply write to temp_image file
 
-                # apply write to image file
+                # copy temp_image to test_image
 
-                # copy image to temp_image
-                # test temp_image
+                # test test_image
+
+                # remove temp_image
+
+            image.cleanup()
+
+        shuffler.cleanup()
+
+if __name__ == '__main__':
+    main()

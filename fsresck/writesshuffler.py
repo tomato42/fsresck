@@ -57,6 +57,7 @@ class WritesShuffler(object):
         self.base_image = base_image
         self.writes = writes
         self._cleanup_image = None
+        self.image_dir = "/tmp"
 
     def shuffle(self):
         """ Return a random permutation of writes with the image """
@@ -65,7 +66,7 @@ class WritesShuffler(object):
         if not isinstance(self.writes, collections.Iterable):
             raise TypeError("'writes' must be iterable")
 
-        image = self.base_image.create_image("/tmp")
+        image = self.base_image.create_image(self.image_dir)
         self._cleanup_image = image
         while True:
             writes = self.writes[:]
@@ -87,7 +88,7 @@ class WritesShuffler(object):
         if not isinstance(self.writes, collections.Iterable):
             raise TypeError("'writes' must be iterable")
 
-        image = self.base_image.create_image("/tmp")
+        image = self.base_image.create_image(self.image_dir)
         self._cleanup_image = image
 
         for i in range(len(self.writes)-1, -1, -1):

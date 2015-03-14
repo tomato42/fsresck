@@ -158,6 +158,20 @@ class TestWritesShuffler(unittest.TestCase):
         with self.assertRaises(TypeError):
             next(ws.shuffle())
 
+    def test_image_dir(self):
+        image = Image("/dev/null", [])
+        image.create_image = mock.MagicMock(return_value="/test/some-name")
+
+        ws = WritesShuffler(image, [Write(lba=0, data=None)])
+        ws.image_dir = "/test"
+
+        test_image, test_writes = next(ws.generator())
+
+        self.assertEqual(image.create_image.call_count, 1)
+        self.assertEqual(image.create_image.call_args, mock.call("/test"))
+
+        self.assertEqual(test_image.image_name, "/test/some-name")
+
     def test_shuffle(self):
 
         image = Image("/tmp/test", [])

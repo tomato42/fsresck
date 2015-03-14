@@ -26,7 +26,9 @@
 """Handling of image modification requests (writes)"""
 
 class Write(object):
+
     """Single image modification request"""
+
     def __init__(self, lba, data, disk_id=None):
         """
         Create an object instance
@@ -37,7 +39,6 @@ class Write(object):
         @param data: data to write at L{lba}
         @param disk_id: base image disk UUID
         """
-
         self.lba = lba
         self.data = data
         self.disk_id = disk_id
@@ -45,9 +46,7 @@ class Write(object):
         self.end_time = None
 
     def __repr__(self):
-        """
-        Return human-readable representation of the object
-        """
+        """Return human-readable representation of the object"""
         if self.disk_id is None and self.start_time is None and \
                 self.end_time is None:
             return "<Write lba={0}, len(data)={1}>".format(
@@ -62,14 +61,14 @@ class Write(object):
                        self.start_time, self.end_time)
 
     def set_times(self, start_time, end_time):
-        """
-        Add the issuence time and completion time of original operation
-        """
+        """Add the issuence time and completion time of original operation"""
         self.start_time = start_time
         self.end_time = end_time
 
     def __eq__(self, other):
         """
+        Check if objects are identical
+
         Compare the object with another to check if it representes the
         same modification.
         """

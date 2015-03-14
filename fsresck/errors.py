@@ -22,9 +22,13 @@
 """ fsresck exceptions """
 
 class FSError(Exception):
+
     """Base exception for all fsresck exceptions"""
+
     pass
 
 class FSCopyError(FSError):
+
     """Error while copying a file"""
+
     pass

@@ -31,6 +31,7 @@ import os
 import tempfile
 import subprocess
 from .errors import FSCopyError
+from . import utils
 
 class Image(object):
     """
@@ -67,10 +68,7 @@ class Image(object):
                                                             dir=path)
             os.close(handle)
 
-            # we want the copy to be CoW aware and preserve sparse locations
-            # so we need to use the native cp command
-            ret = subprocess.call(['cp', '--reflink=auto', '--sparse=always',
-                                   self.image_name, self.temp_image_name])
+            ret = utils.copy(self.image_name, self.temp_image_name)
             if ret != 0:
                 raise FSCopyError("Copy failed, error: {0}".format(ret))
 

@@ -30,7 +30,6 @@ from .image import Image
 
 import random
 from itertools import permutations
-import collections
 
 class WritesShuffler(object):
 

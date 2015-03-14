@@ -29,7 +29,6 @@ Disk image handlers
 
 import os
 import tempfile
-import subprocess
 from .errors import FSCopyError
 from . import utils
 

@@ -29,7 +29,9 @@
 from .write import Write
 
 class Fragmenter(object):
+
     """Object for fragmenting a list of writes furter"""
+
     def __init__(self, sector_size=512):
         """
         Create an object

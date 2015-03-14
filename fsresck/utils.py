@@ -22,6 +22,9 @@
 """Utility functions"""
 
 import subprocess
+import tempfile
+import os
+from .errors import FSCopyError
 
 def copy(source, destination):
     """
@@ -32,5 +35,18 @@ def copy(source, destination):
     """
     # we want the copy to be CoW aware and preserve sparse locations
     # so we need to use the native cp command
-    return subprocess.call(['cp', '--reflink=auto', '--sparse=always',
-                            source, destination])
+    ret = subprocess.call(['cp', '--reflink=auto', '--sparse=always',
+                           source, destination])
+    if ret != 0:
+        raise FSCopyError("File copy failed, error {0}".format(ret))
+
+def get_temp_file_name(directory, prefix='fsresck.'):
+    """
+    Create a file with unique name in directory
+
+    Create a File in provided directory with unique name in safe and atomic
+    way
+    """
+    handle, file_name = tempfile.mkstemp(prefix=prefix, dir=directory)
+    os.close(handle)
+    return file_name

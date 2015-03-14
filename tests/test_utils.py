@@ -38,10 +38,13 @@ except ImportError:
     from unittest.mock import call
 
 import subprocess
-from fsresck.utils import copy
+import tempfile
+import os
+from fsresck.utils import copy, get_temp_file_name
+from fsresck.errors import FSCopyError
 
 class TestCopy(unittest.TestCase):
-    def test_copy(self):
+    def test_copy_with_error(self):
 
         patcher = mock.patch.object(subprocess,
                                     'call',
@@ -49,9 +52,38 @@ class TestCopy(unittest.TestCase):
         mock_call = patcher.start()
         self.addCleanup(patcher.stop)
 
-        ret = copy("file-A", "file-B")
+        with self.assertRaises(FSCopyError):
+            copy("file-A", "file-B")
 
-        self.assertEqual(ret, 3)
+    def test_copy(self):
+        patcher = mock.patch.object(subprocess,
+                                    'call',
+                                    mock.MagicMock(return_value=0))
+        mock_call = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        copy("file-A", "file-B")
+
         self.assertEqual(1, mock_call.call_count)
         self.assertEqual("file-A", mock_call.call_args[0][0][-2])
         self.assertEqual("file-B", mock_call.call_args[0][0][-1])
+
+    def test_get_temp_file_name(self):
+        patcher = mock.patch.object(tempfile,
+                                    'mkstemp',
+                                    mock.MagicMock(return_value=(-33, "name3")))
+        mock_mkstemp = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = mock.patch.object(os,
+                                    'close',
+                                    mock.MagicMock())
+        mock_close = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        name = get_temp_file_name('/dir-name')
+
+        self.assertEqual(name, "name3")
+
+        mock_mkstemp.assert_called_once_with(prefix='fsresck.', dir='/dir-name')
+        mock_close.assert_called_once_with(-33)

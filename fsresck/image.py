@@ -26,8 +26,6 @@
 """Disk image handlers"""
 
 import os
-import tempfile
-from .errors import FSCopyError
 from . import utils
 
 class Image(object):
@@ -62,14 +60,9 @@ class Image(object):
         and return its name.
         """
         if self.temp_image_name is None:
-            # create a temp file in directory path
-            handle, self.temp_image_name = tempfile.mkstemp(prefix='fsresck.',
-                                                            dir=path)
-            os.close(handle)
+            self.temp_image_name = utils.get_temp_file_name(path)
 
-            ret = utils.copy(self.image_name, self.temp_image_name)
-            if ret != 0:
-                raise FSCopyError("Copy failed, error: {0}".format(ret))
+            utils.copy(self.image_name, self.temp_image_name)
 
             # apply writes to the copied image
             with open(self.temp_image_name, "w+b") as image:

@@ -30,7 +30,6 @@ from .image import Image
 
 import random
 from itertools import permutations
-import collections
 
 class WritesShuffler(object):
 
@@ -58,8 +57,7 @@ class WritesShuffler(object):
         """ Return a random permutation of writes with the image """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
-        if not isinstance(self.writes, collections.Iterable):
-            raise TypeError("'writes' must be iterable")
+        self.writes = list(self.writes)
 
         image = self.base_image.create_image(self.image_dir)
 
@@ -80,8 +78,7 @@ class WritesShuffler(object):
         """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
-        if not isinstance(self.writes, collections.Iterable):
-            raise TypeError("'writes' must be iterable")
+        self.writes = list(self.writes)
 
         image = self.base_image.create_image(self.image_dir)
 

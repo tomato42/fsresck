@@ -124,23 +124,27 @@ class TestWritesShuffler(unittest.TestCase):
         self.assertEqual(test_writes, (writes[2], writes[1], writes[0]))
 
     def test_cleanup(self):
-        image = Image("/dev/null", [])
-        image.create_image = lambda x: "/tmp/some-name"
-
-        writes = [
-            Write(lba=0, data=bytearray(1)),
-            Write(lba=1, data=bytearray(1)),
-            Write(lba=2, data=bytearray(1))
-            ]
-        ws = WritesShuffler(image, writes)
-        next(ws.generator())
-
         patcher = mock.patch.object(os,
                                     'unlink',
                                     mock.MagicMock())
         os_unlink = patcher.start()
         self.addCleanup(patcher.stop)
 
+        image = Image("/dev/null", [])
+
+        def dumb_create_image(arg):
+            image.temp_image_name = "/tmp/some-name"
+            return image.temp_image_name
+        image.create_image = mock.MagicMock(side_effect=dumb_create_image)
+
+        writes = [
+            Write(lba=0, data=bytearray(1)),
+            Write(lba=1, data=bytearray(1)),
+            Write(lba=2, data=bytearray(1))
+            ]
+
+        ws = WritesShuffler(image, writes)
+        next(ws.generator())
         ws.cleanup()
 
         self.assertEqual(os_unlink.call_count, 1)

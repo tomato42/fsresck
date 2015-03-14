@@ -26,7 +26,6 @@
 """Disk image handlers"""
 
 import os
-import tempfile
 from . import utils
 
 class Image(object):
@@ -61,10 +60,7 @@ class Image(object):
         and return its name.
         """
         if self.temp_image_name is None:
-            # create a temp file in directory path
-            handle, self.temp_image_name = tempfile.mkstemp(prefix='fsresck.',
-                                                            dir=path)
-            os.close(handle)
+            self.temp_image_name = utils.get_temp_file_name(path)
 
             utils.copy(self.image_name, self.temp_image_name)
 

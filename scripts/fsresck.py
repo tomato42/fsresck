@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import fsresck.imagegenerator
+from fsresck.imagegenerator import BaseImageGenerator
 from fsresck.fragmenter import Fragmenter
 from fsresck.writesshuffler import WritesShuffler
 import fsresck.utils as utils
@@ -9,18 +9,18 @@ import os
 def main():
 
     # get the unmodified image file name
+    unmodified_image = "/tmp/file"
 
     # get the change log for the file system image
+    log = None
 
-    base_gen = imagegenerator.BaseImageGenerator((unmodified_image, log))
+    base_gen = BaseImageGenerator((unmodified_image, log))
 
     for base_image, writes in base_gen.generate():
 
-        # fragment writes to sector sized chunks
         fragmenter = Fragmenter(sector_size=512)
         writes = fragmenter.fragment(writes)
 
-        # generate permutations of writes to apply to image
         shuffler = WritesShuffler(base_image, writes)
 
         for image, shuffled_writes in shuffler.generator():

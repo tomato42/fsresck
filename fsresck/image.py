@@ -27,7 +27,6 @@
 
 import os
 import tempfile
-from .errors import FSCopyError
 from . import utils
 
 class Image(object):

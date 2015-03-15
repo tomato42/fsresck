@@ -1,6 +1,6 @@
 #
 #   Description: File system resilience testing application
-#   Author: Hubert Kario <hkario@redhat.com>
+#   Author: Hubert Kario <hubert@kario.pl>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #

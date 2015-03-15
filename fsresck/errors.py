@@ -32,3 +32,9 @@ class FSCopyError(FSError):
     """Error while copying a file"""
 
     pass
+
+class TruncatedFileError(FSError):
+
+    """Write data seems to be truncated in the middle"""
+
+    pass

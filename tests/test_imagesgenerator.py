@@ -37,8 +37,16 @@ except ImportError:
     import unittest.mock as mock
     from unittest.mock import call
 
+import sys
+if sys.version_info[0] == 2:
+    import __builtin__ as builtins
+else:
+    import builtins
+
+import io
 from fsresck.imagegenerator import BaseImageGenerator, LogReader
 from fsresck.write import Write
+from fsresck.errors import TruncatedFileError
 
 class TestBaseImageGenerator(unittest.TestCase):
     def test___init__(self):
@@ -186,5 +194,49 @@ class TestLogReader(unittest.TestCase):
     def test_reader(self):
         log_reader = LogReader('/tmp/log')
 
-        with self.assertRaises(NotImplementedError):
-            log_reader.reader()
+        log = (\
+            b'\x00'*3 + b'\x01' +           # write operation
+            b'\x00'*8 +                     # start_time = 0
+            b'\x00'*8 +                     # end_time = 0
+            b'\x00'*8 +                     # offset = 0
+            b'\x00'*3 + b'\x0a' +           # length = 10 bytes
+            b'\x01'*10                      # data
+            )
+
+        open_mock = mock.MagicMock(return_value=io.BytesIO(log))
+        patcher = mock.patch.object(builtins,
+                                    'open',
+                                    open_mock)
+        mock_open = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        writes = list(log_reader.reader())
+
+        write = Write(lba=0, data=bytearray(b'\x01'*10))
+        write.set_times(0.0, 0.0)
+        self.assertEqual(writes, [write])
+
+    def test_reader_with_truncated_file(self):
+        log_reader = LogReader('/tmp/log')
+
+        log = (\
+            b'\x00'*3 + b'\x01' +           # write operation
+            b'\x00'*8 +                     # start_time = 0
+            b'\x00'*8 +                     # end_time = 0
+            b'\x00'*8 +                     # offset = 0
+            b'\x00'*3 + b'\x0a' +           # length = 10 bytes
+            b'\x01'*9                       # data
+            )
+
+        if sys.version_info[0] == 2:
+            log = str(log)
+
+        open_mock = mock.MagicMock(return_value=io.BytesIO(log))
+        patcher = mock.patch.object(builtins,
+                                    'open',
+                                    open_mock)
+        mock_open = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        with self.assertRaises(TruncatedFileError):
+            next(log_reader.reader())

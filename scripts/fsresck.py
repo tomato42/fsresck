@@ -12,9 +12,9 @@ def main():
     unmodified_image = "/tmp/file"
 
     # get the change log for the file system image
-    log = None
+    log = "/tmp/file-writes"
 
-    base_gen = BaseImageGenerator((unmodified_image, log))
+    base_gen = BaseImageGenerator(unmodified_image, log)
 
     for base_image, writes in base_gen.generate():
 

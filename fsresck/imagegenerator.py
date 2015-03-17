@@ -71,6 +71,11 @@ class LogHeader(object):
 
         return self
 
+    def write(self):
+        """Serialise the object to bytes"""
+        return struct.pack(self.header_format, self.operation, self.start_time,
+                           self.end_time, self.offset, self.length)
+
 class LogReader(object):
 
     """Parser for log files"""

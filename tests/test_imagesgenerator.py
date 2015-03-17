@@ -44,7 +44,7 @@ else:
     import builtins
 
 import io
-from fsresck.imagegenerator import BaseImageGenerator, LogReader
+from fsresck.imagegenerator import BaseImageGenerator, LogReader, LogHeader
 from fsresck.write import Write
 from fsresck.errors import TruncatedFileError
 
@@ -240,3 +240,28 @@ class TestLogReader(unittest.TestCase):
 
         with self.assertRaises(TruncatedFileError):
             next(log_reader.reader())
+
+class TestLogHeader(unittest.TestCase):
+    def test___init__(self):
+        header = LogHeader()
+
+        self.assertEqual(header.operation, 0)
+        self.assertEqual(header.start_time, 0.0)
+        self.assertEqual(header.end_time, 0.0)
+        self.assertEqual(header.offset, 0)
+        self.assertEqual(header.length, 0)
+
+    def test_write(self):
+        header = LogHeader()
+
+        header.operation = 1
+        header.offset = 512
+        header.length = 1024
+
+        self.assertEqual(\
+                b'\x00'*3 + b'\x01' +       # operation
+                b'\x00'*8 +                 # start_time
+                b'\x00'*8 +                 # end_time
+                b'\x00'*6 + b'\x02\x00' +   # offset
+                b'\x00'*2 + b'\x04\x00'
+                , header.write())

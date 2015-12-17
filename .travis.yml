@@ -15,13 +15,14 @@ before_install:
   - |
        # workaround https://github.com/travis-ci/travis-ci/issues/2666
        if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-         PR_FIRST=$(curl -s https://github.com/${TRAVIS_REPO_SLUG}/pull/${TRAVIS_PULL_REQUEST}.patch | head -1 | grep -o -E '\b[0-9a-f]{40}\b' | tr -d '\n')
+         PR_FIRST=$(curl --silent --show-error --location https://github.com/${TRAVIS_REPO_SLUG}/pull/${TRAVIS_PULL_REQUEST}.patch | head -1 | grep -o -E '\b[0-9a-f]{40}\b' | tr -d '\n')
          TRAVIS_COMMIT_RANGE=$PR_FIRST^..$TRAVIS_COMMIT
        fi
   - git fetch origin master:refs/remotes/origin/master
 
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then travis_retry pip install unittest2; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.2' ]]; then travis_retry pip install 'coverage<4'; else travis_retry pip install coverage; fi
   - travis_retry pip install -r build-requirements.txt
 
 script:

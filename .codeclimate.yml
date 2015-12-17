@@ -1,0 +1,22 @@
+engines:
+  radon:
+    enabled: true
+  pep8:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
+    checks:
+      bug:
+        enabled: true
+ratings:
+  paths:
+  - "fsresck/**"
+  - "**.py"
+exclude_paths:
+ - "tests/**/*"
+ - "scripts/**/*"

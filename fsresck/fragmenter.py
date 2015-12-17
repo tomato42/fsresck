@@ -23,17 +23,18 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"""Methods to fragment list of writes"""
+"""Methods to fragment list of writes."""
 
 from .write import Write
 
+
 class Fragmenter(object):
 
-    """Object for fragmenting a list of writes furter"""
+    """Object for fragmenting a list of writes further."""
 
     def __init__(self, sector_size=512):
         """
-        Create an object
+        Create an object.
 
         @param sector_size: maximum size of the generated fragments
         """
@@ -41,7 +42,7 @@ class Fragmenter(object):
 
     def fragment(self, writes):
         """
-        Returns a generator with fragmented Write objects from passed writes.
+        Return a generator with fragmented Write objects from passed writes.
 
         @param writes: list of Write objects
         """

@@ -19,16 +19,17 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"""Utility functions"""
+"""Utility functions."""
 
 import subprocess
 import tempfile
 import os
 from .errors import FSCopyError
 
+
 def copy(source, destination):
     """
-    copy file from source to destination
+    Copy file from source to destination.
 
     Copy a file using the os `cp` command with options that should preserve
     sparse information and CoW status
@@ -40,9 +41,10 @@ def copy(source, destination):
     if ret != 0:
         raise FSCopyError("File copy failed, error {0}".format(ret))
 
+
 def get_temp_file_name(directory, prefix='fsresck.'):
     """
-    Create a file with unique name in directory
+    Create a file with unique name in directory.
 
     Create a File in provided directory with unique name in safe and atomic
     way

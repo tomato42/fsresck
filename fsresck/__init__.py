@@ -22,4 +22,4 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"""Library for testing resiliency of file systems"""
+"""Library for testing resiliency of file systems."""

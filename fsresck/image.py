@@ -22,15 +22,16 @@
 #   Boston, MA 02110-1301, USA.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-"""Disk image handlers"""
+"""Disk image handlers."""
 
 import os
 from . import utils
 
+
 class Image(object):
 
     """
-    Object for creating temporary copies of FS image with modifications
+    Object for creating temporary copies of FS image with modifications.
 
     Object for keeping disk image (in form of a file) together with writes
     to modify it, methods to apply those writes to temporary file and cleanup
@@ -38,13 +39,13 @@ class Image(object):
     """
 
     def __init__(self, image_name, writes):
-        """Combine disk file image with writes"""
+        """Combine disk file image with writes."""
         self.image_name = image_name
         self.writes = writes
         self.temp_image_name = None
 
     def __repr__(self):
-        """Return human readable representation of object"""
+        """Return human readable representation of object."""
         if self.temp_image_name is not None:
             return "Image(image_name={0!r}, writes=[])"\
                     .format(self.temp_image_name)
@@ -53,7 +54,7 @@ class Image(object):
 
     def create_image(self, path):
         """
-        Create temporary image file
+        Create temporary image file.
 
         Copy the base image to temporary file in 'path', apply writes to it
         and return its name.
@@ -73,7 +74,7 @@ class Image(object):
 
     def cleanup(self):
         """
-        Remove temporary image file
+        Remove temporary image file.
 
         Remove the temporary image name, make it possible to create a new
         temporary copy with appplied writes

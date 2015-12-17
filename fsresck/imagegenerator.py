@@ -23,7 +23,7 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"""Slicing log files for tests"""
+"""Slicing log files for tests."""
 
 import struct
 from collections import deque
@@ -32,10 +32,11 @@ from .image import Image
 from .write import Write
 from .errors import TruncatedFileError
 
+
 class LogHeader(object):
 
     """
-    Handler for write headers in log files
+    Handler for write headers in log files.
 
     Reads the following fields in big-endian format:
     32bit unsigned int - operation type (only "1" supported - write),
@@ -49,7 +50,7 @@ class LogHeader(object):
     header_length = struct.calcsize(header_format)
 
     def __init__(self):
-        """init"""
+        """Create object."""
         self.operation = 0
         self.start_time = 0.0
         self.end_time = 0.0
@@ -57,7 +58,7 @@ class LogHeader(object):
         self.length = 0
 
     def parse(self, data):
-        """Parse object from bytearray"""
+        """Parse object from bytearray."""
         operation, start_time, end_time, offset, length = struct.unpack(
             self.header_format, data)
 
@@ -72,21 +73,22 @@ class LogHeader(object):
         return self
 
     def write(self):
-        """Serialise the object to bytes"""
+        """Serialise the object to bytes."""
         return struct.pack(self.header_format, self.operation, self.start_time,
                            self.end_time, self.offset, self.length)
 
+
 class LogReader(object):
 
-    """Parser for log files"""
+    """Parser for log files."""
 
     def __init__(self, log_name):
-        """Open log file"""
+        """Open log file."""
         self.log_name = log_name
 
     @staticmethod
     def _read_exact(handle, length):
-        """Read exact amount of data from file, fail if unavailable"""
+        """Read exact amount of data from file, fail if unavailable."""
         data = handle.read(length)
         if not data:
             raise EOFError("End of file reached")
@@ -95,11 +97,12 @@ class LogReader(object):
         return data
 
     def reader(self):
-        """Generator for reads in file"""
+        """Generator for reads in file."""
         with open(self.log_name, 'r+b') as log:
             while True:
                 try:
-                    header_data = self._read_exact(log, LogHeader.header_length)
+                    header_data = self._read_exact(log,
+                                                   LogHeader.header_length)
                 except EOFError:
                     break
 
@@ -112,22 +115,23 @@ class LogReader(object):
 
                 yield write
 
+
 class BaseImageGenerator(object):
 
     """
-    Generator for pairs of images and writes to test
+    Generator for pairs of images and writes to test.
 
     Tests ops_to_test at a time by default
     """
 
     def __init__(self, image_name, log_name):
-        """Provide name of image file and writes log"""
+        """Provide name of image file and writes log."""
         self.image_name = image_name
         self.log_name = log_name
         self.ops_to_test = 5
 
     def generate(self):
-        """Create tuples of Image and writes to test"""
+        """Create tuples of Image and writes to test."""
         write_log = LogReader(self.log_name)
         log_reader = write_log.reader()
 

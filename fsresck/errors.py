@@ -19,22 +19,25 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-""" fsresck exceptions """
+"""fsresck exceptions."""
+
 
 class FSError(Exception):
 
-    """Base exception for all fsresck exceptions"""
+    """Base exception for all fsresck exceptions."""
 
     pass
+
 
 class FSCopyError(FSError):
 
-    """Error while copying a file"""
+    """Error while copying a file."""
 
     pass
 
+
 class TruncatedFileError(FSError):
 
-    """Write data seems to be truncated in the middle"""
+    """Write data seems to be truncated in the middle."""
 
     pass

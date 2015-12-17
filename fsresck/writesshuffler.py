@@ -23,17 +23,18 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-""" Helper methods for creating non-repeating permutations of images """
+"""Helper methods for creating non-repeating permutations of images."""
 
 from .image import Image
 
 import random
 from itertools import permutations
 
+
 class WritesShuffler(object):
 
     """
-    Generate sets of writes for image files
+    Generate sets of writes for image files.
 
     Generator that takes an image, set of writes and generates permutations
     of images and writes to test
@@ -43,7 +44,7 @@ class WritesShuffler(object):
 
     def __init__(self, base_image, writes):
         """
-        Link image file with writes
+        Link image file with writes.
 
         Provide the image that will create the base for the tests and the
         writes that should get tested.
@@ -53,7 +54,7 @@ class WritesShuffler(object):
         self.image_dir = "/tmp"
 
     def shuffle(self):
-        """ Return a random permutation of writes with the image """
+        """Return a random permutation of writes with the image."""
         if self.base_image is None:
             raise TypeError("base_image can't be None")
         self.writes = list(self.writes)
@@ -70,7 +71,7 @@ class WritesShuffler(object):
 
     def generator(self):
         """
-        Return all permutations of writes on an image
+        Return all permutations of writes on an image.
 
         Iterator that returns pairs of images and logs of writes that are
         shuffled in a way that makes them unique
@@ -96,5 +97,5 @@ class WritesShuffler(object):
                 yield (Image(image, image_writes), perm)
 
     def cleanup(self):
-        """ Remove the temporary image created by generator and shuffle """
+        """Remove the temporary image created by generator and shuffle."""
         self.base_image.cleanup()

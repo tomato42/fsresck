@@ -88,7 +88,7 @@ class LogReader(object):
     def _read_exact(handle, length):
         """Read exact amount of data from file, fail if unavailable"""
         data = handle.read(length)
-        if len(data) == 0:
+        if not data:
             raise EOFError("End of file reached")
         if len(data) != length:
             raise TruncatedFileError("truncated file")
@@ -144,6 +144,6 @@ class BaseImageGenerator(object):
             writes.append(write)
             yield (Image(self.image_name, list(image_writes)), list(writes))
 
-        while len(writes) > 0:
+        while writes:
             image_writes.append(writes.popleft())
             yield (Image(self.image_name, list(image_writes)), list(writes))

@@ -10,6 +10,13 @@ ignore-paths:
     - tests
     - scripts
 
+python-targets:
+    - 2
+    - 3
+
+pep8:
+    full: true
+
 pep257:
     disable:
         - D203

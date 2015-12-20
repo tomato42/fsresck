@@ -25,3 +25,5 @@ endif
 endif
 	coverage run --branch --source fsresck -m unittest discover
 	coverage report -m
+	pep8 fsresck
+	pep257 fsresck

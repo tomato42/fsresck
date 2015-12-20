@@ -57,12 +57,16 @@ class TestWritesShuffler(unittest.TestCase):
 
         ws = WritesShuffler(image, writes)
         tests = list(ws.generator())
-        self.assertEqual(len(tests), 1)
+        self.assertEqual(len(tests), 2)
         self.assertEqual(len(tests[0]), 2)
         image, writes = tests[0]
         self.assertEqual(image.image_name, "/tmp/some-name")
         self.assertEqual(image.writes, [])
         self.assertEqual(writes, tuple())
+        image, writes = tests[1]
+        self.assertEqual(image.image_name, "/tmp/some-name")
+        self.assertEqual(image.writes, [])
+        self.assertEqual(writes, tuple([Write(lba=0, data=bytearray(512))]))
 
     def test_generator_with_invalid_data(self):
         ws = WritesShuffler(None, [])
@@ -79,48 +83,130 @@ class TestWritesShuffler(unittest.TestCase):
         image = Image("/dev/null", [])
         # mock the object to not create an image copy
         image.create_image = lambda x: "/tmp/some-name"
+        # writes need to overlap to create permutations instead of combinations
         writes = [
             Write(lba=0, data=bytearray(512)),
-            Write(lba=512, data=bytearray(512)),
-            Write(lba=1024, data=bytearray(512)),
+            Write(lba=1, data=bytearray(512)),
+            Write(lba=2, data=bytearray(512)),
+            Write(lba=3, data=bytearray(512))
             ]
 
         ws = WritesShuffler(image, writes)
 
         tests = list(ws.generator())
 
-        self.assertEqual(len(tests), 6)
+        self.assertEqual(len(tests), 22)
         self.assertEqual(len(tests[0]), 2)
 
         test_image, test_writes = tests[0]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
-        self.assertEqual(test_image.writes, [writes[0], writes[1]])
+        self.assertEqual(test_image.writes, [])
         self.assertEqual(test_writes, tuple())
 
         test_image, test_writes = tests[1]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
-        self.assertEqual(test_image.writes, [writes[0]])
-        self.assertEqual(test_writes, (writes[2], writes[1]))
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[0], ))
 
         test_image, test_writes = tests[2]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
         self.assertEqual(test_image.writes, [])
-        self.assertEqual(test_writes, (writes[1], writes[0], writes[2]))
+        self.assertEqual(test_writes, (writes[1], ))
 
         test_image, test_writes = tests[3]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
         self.assertEqual(test_image.writes, [])
-        self.assertEqual(test_writes, (writes[1], writes[2], writes[0]))
+        self.assertEqual(test_writes, (writes[2], ))
 
         test_image, test_writes = tests[4]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
         self.assertEqual(test_image.writes, [])
-        self.assertEqual(test_writes, (writes[2], writes[0], writes[1]))
+        self.assertEqual(test_writes, (writes[0], writes[1]))
 
         test_image, test_writes = tests[5]
         self.assertEqual(test_image.image_name, "/tmp/some-name")
         self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[0], writes[2]))
+
+        test_image, test_writes = tests[6]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[0]))
+
+        test_image, test_writes = tests[7]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[2]))
+
+        test_image, test_writes = tests[8]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[2], writes[0]))
+
+        test_image, test_writes = tests[9]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[2], writes[1]))
+
+        test_image, test_writes = tests[10]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[0], writes[1], writes[2]))
+
+        test_image, test_writes = tests[11]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[0], writes[2], writes[1]))
+
+        test_image, test_writes = tests[12]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[0], writes[2]))
+
+        test_image, test_writes = tests[13]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[1], writes[2], writes[0]))
+
+        test_image, test_writes = tests[14]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
+        self.assertEqual(test_writes, (writes[2], writes[0], writes[1]))
+
+        test_image, test_writes = tests[15]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [])
         self.assertEqual(test_writes, (writes[2], writes[1], writes[0]))
+
+        test_image, test_writes = tests[16]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[1], writes[2], writes[3]))
+
+        test_image, test_writes = tests[17]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[1], writes[3], writes[2]))
+
+        test_image, test_writes = tests[18]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[2], writes[1], writes[3]))
+
+        test_image, test_writes = tests[19]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[2], writes[3], writes[1]))
+
+        test_image, test_writes = tests[20]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[3], writes[1], writes[2]))
+
+        test_image, test_writes = tests[21]
+        self.assertEqual(test_image.image_name, "/tmp/some-name")
+        self.assertEqual(test_image.writes, [writes[0]])
+        self.assertEqual(test_writes, (writes[3], writes[2], writes[1]))
 
     def test_cleanup(self):
         patcher = mock.patch.object(os,

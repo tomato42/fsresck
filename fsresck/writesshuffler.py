@@ -69,12 +69,15 @@ class WritesShuffler(object):
                 continue
             yield (Image(image, []), writes)
 
-    def generator(self):
+    def generator(self, group_size=3):
         """
         Return all permutations of writes on an image.
 
         Iterator that returns pairs of images and logs of writes that are
-        shuffled in a way that makes them unique
+        shuffled in a way that makes them unique.
+
+        The group_size specifies how big the permutation group will be, where
+        the group is a set of last written blocks to image.
         """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
@@ -82,19 +85,18 @@ class WritesShuffler(object):
 
         image = self.base_image.create_image(self.image_dir)
 
-        for i in range(len(self.writes)-1, -1, -1):
-            image_writes = self.writes[:i]
-            writes = self.writes[i:]
+        for i in range(group_size):
+            draw_group = self.writes[:group_size]
+            for perm in permutations(draw_group, i):
+                yield (Image(image, []), perm)
 
-            if len(writes) == 1:
-                yield (Image(image, image_writes), tuple())
-                continue
-
-            for perm in permutations(writes):
-                # skip permutations where the first element is in order
-                if perm[0] == writes[0]:
-                    continue
-                yield (Image(image, image_writes), perm)
+        for j, base in enumerate(self.writes[:i] for i in
+                                 range(max(0,
+                                           len(self.writes) -
+                                           group_size + 1))):
+            draw_group = self.writes[j:j+group_size]
+            for perm in permutations(draw_group):
+                yield (Image(image, base), perm)
 
     def cleanup(self):
         """Remove the temporary image created by generator and shuffle."""

@@ -72,5 +72,13 @@ class Write(object):
         Compare the object with another to check if it representes the
         same modification.
         """
-        return (isinstance(other, Write)
-            and self.__dict__ == other.__dict__)
+        return (isinstance(other, Write) and
+                self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        """
+        Check if objects are different.
+
+        Compare the object with another to check if they are different
+        """
+        return not self.__eq__(other)

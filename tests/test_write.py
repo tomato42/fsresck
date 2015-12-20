@@ -59,6 +59,12 @@ class TestWrite(unittest.TestCase):
 
         self.assertFalse(write1 == write2)
 
+    def test___ne__(self):
+        write1 = Write(0, bytearray(512))
+        write2 = Write(0, bytearray(512))
+
+        self.assertFalse(write1 != write2)
+
     def test___eq__with_non_Write_other(self):
         write1 = Write(0, bytearray(512))
         write2 = None

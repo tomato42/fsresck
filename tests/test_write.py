@@ -24,7 +24,7 @@ try:
 except ImportError:
         import unittest
 
-from fsresck.write import Write
+from fsresck.write import Write, overlapping
 
 class TestWrite(unittest.TestCase):
     def test___init__(self):
@@ -96,3 +96,36 @@ class TestWrite(unittest.TestCase):
 
         self.assertEqual(write.start_time, 12)
         self.assertEqual(write.end_time, 14)
+
+class TestOverlapping(unittest.TestCase):
+    def test_non_overlapping(self):
+        writes = [Write(lba=0, data=bytearray(512)),
+                  Write(lba=512, data=bytearray(512)),
+                  Write(lba=1024, data=bytearray(512))]
+
+        self.assertFalse(overlapping(writes))
+
+    def test_overlapping_second_beginning(self):
+        writes = [Write(lba=512, data=bytearray(512)),
+                  Write(lba=1023, data=bytearray(512))]
+
+        self.assertTrue(overlapping(writes))
+
+    def test_overlapping_second_end(self):
+        writes = [Write(lba=512, data=bytearray(512)),
+                  Write(lba=0, data=bytearray(513))]
+
+        self.assertTrue(overlapping(writes))
+
+    def test_overlapping_first_beginning(self):
+        writes = [Write(lba=1023, data=bytearray(512)),
+                  Write(lba=512, data=bytearray(512))]
+
+        self.assertTrue(overlapping(writes))
+
+    def test_overlapping_first_end(self):
+        writes = [Write(lba=0, data=bytearray(513)),
+                  Write(lba=512, data=bytearray(512))]
+
+        self.assertTrue(overlapping(writes))
+

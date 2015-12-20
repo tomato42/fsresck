@@ -25,6 +25,24 @@
 """Handling of image modification requests (writes)."""
 
 
+def overlapping(iterator):
+    """Check if the writes in iterator are not overlapping each other."""
+    writes = list(iterator)
+
+    for i, write in enumerate(writes):
+        for other_write in writes[i+1:]:
+            write_start = write.lba
+            write_end = write.lba + len(write.data)
+            other_write_start = other_write.lba
+            other_write_end = other_write.lba + len(other_write.data)
+
+            if other_write_start < write_end < other_write_end:
+                return True
+            if other_write_start <= write_start < other_write_end:
+                return True
+    return False
+
+
 class Write(object):
 
     """Single image modification request."""

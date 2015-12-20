@@ -6,6 +6,10 @@ clean:
 	rm -rf tests/__pycache__/
 	rm -rf fsresck/*.pyc
 	rm -rf fsresck/__pycache__/
+	rm -rf fsresck/nbd/*.pyc
+	rm -rf fsresck/nbd/__pycache__/
+	rm -rf tests/nbd/*.pyc
+	rm -rf tests/nbd/__pycache__/
 
 test-dev: test
 	coverage run --branch --source fsresck -m unittest discover

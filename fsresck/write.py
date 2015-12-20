@@ -72,14 +72,5 @@ class Write(object):
         Compare the object with another to check if it representes the
         same modification.
         """
-        if not isinstance(other, Write):
-            return False
-
-        if self.lba == other.lba and\
-           self.data == other.data and\
-           self.disk_id == other.disk_id and\
-           self.start_time == other.start_time and\
-           self.end_time == other.end_time:
-            return True
-        else:
-            return False
+        return (isinstance(other, Write)
+            and self.__dict__ == other.__dict__)

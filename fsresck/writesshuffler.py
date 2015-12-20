@@ -28,7 +28,9 @@
 from .image import Image
 
 import random
-from itertools import permutations
+from itertools import permutations, combinations
+
+from .write import overlapping
 
 
 class WritesShuffler(object):
@@ -69,7 +71,7 @@ class WritesShuffler(object):
                 continue
             yield (Image(image, []), writes)
 
-    def generator(self, group_size=3):
+    def generator(self, group_size=3, comb_size=5):
         """
         Return all permutations of writes on an image.
 
@@ -78,6 +80,11 @@ class WritesShuffler(object):
 
         The group_size specifies how big the permutation group will be, where
         the group is a set of last written blocks to image.
+
+        The comb_size specifies the size of set for drawing elements for
+        combinations of writes. This is the fallback mechanism if it turns
+        out that all the permutations would be equivalent - produce the same
+        image on output
         """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
@@ -87,16 +94,25 @@ class WritesShuffler(object):
 
         for i in range(group_size):
             draw_group = self.writes[:group_size]
-            for perm in permutations(draw_group, i):
-                yield (Image(image, []), perm)
+            if overlapping(draw_group):
+                for perm in permutations(draw_group, i):
+                    yield (Image(image, []), perm)
+            else:
+                for comb in combinations(self.writes[:comb_size], i):
+                    yield (Image(image, []), comb)
 
         for j, base in enumerate(self.writes[:i] for i in
                                  range(max(0,
                                            len(self.writes) -
                                            group_size + 1))):
             draw_group = self.writes[j:j+group_size]
-            for perm in permutations(draw_group):
-                yield (Image(image, base), perm)
+            if overlapping(draw_group):
+                for perm in permutations(draw_group):
+                    yield (Image(image, base), perm)
+            else:
+                for comb in combinations(self.writes[j:j+comb_size],
+                                         group_size):
+                    yield (Image(image, base), comb)
 
     def cleanup(self):
         """Remove the temporary image created by generator and shuffle."""

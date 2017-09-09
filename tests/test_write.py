@@ -41,7 +41,7 @@ class TestWrite(unittest.TestCase):
         write = Write(0, bytearray(512))
 
         self.assertIsNotNone(write)
-        self.assertEqual(0, write.lba)
+        self.assertEqual(0, write.offset)
         self.assertEqual(bytearray(512), write.data)
         self.assertEqual(None, write.disk_id)
         self.assertEqual(None, write.start_time)
@@ -72,25 +72,26 @@ class TestWrite(unittest.TestCase):
         self.assertFalse(write1 == write2)
 
     def test___str__(self):
-        write = Write(lba=512, data=bytearray(65536), disk_id=1234)
+        write = Write(offset=512, data=bytearray(65536), disk_id=1234)
         write.set_times(33, 22)
 
-        self.assertEqual("<Write lba=512, len(data)=65536, disk_id=1234, "\
+        self.assertEqual("<Write offset=512, len(data)=65536, disk_id=1234, "
                          "start_time=33, end_time=22>",
                          str(write))
 
-    def test___repr___with_just_lba_and_data(self):
-        write = Write(lba=512, data=bytearray(1024))
+    def test___repr___with_just_offset_and_data(self):
+        write = Write(offset=512, data=bytearray(1024))
 
-        self.assertEqual("<Write lba=512, len(data)=1024>", repr(write))
+        self.assertEqual("<Write offset=512, len(data)=1024>", repr(write))
 
-    def test___repr___with_just_lba_data_and_disk_id(self):
-        write = Write(lba=1, data=bytearray(2), disk_id=3)
+    def test___repr___with_just_offset_data_and_disk_id(self):
+        write = Write(offset=1, data=bytearray(2), disk_id=3)
 
-        self.assertEqual("<Write lba=1, len(data)=2, disk_id=3>", repr(write))
+        self.assertEqual("<Write offset=1, len(data)=2, disk_id=3>",
+                         repr(write))
 
     def test_set_times(self):
-        write = Write(lba=0, data=bytearray(65536))
+        write = Write(offset=0, data=bytearray(65536))
 
         write.set_times(12, 14)
 
@@ -99,33 +100,33 @@ class TestWrite(unittest.TestCase):
 
 class TestOverlapping(unittest.TestCase):
     def test_non_overlapping(self):
-        writes = [Write(lba=0, data=bytearray(512)),
-                  Write(lba=512, data=bytearray(512)),
-                  Write(lba=1024, data=bytearray(512))]
+        writes = [Write(offset=0, data=bytearray(512)),
+                  Write(offset=512, data=bytearray(512)),
+                  Write(offset=1024, data=bytearray(512))]
 
         self.assertFalse(overlapping(writes))
 
     def test_overlapping_second_beginning(self):
-        writes = [Write(lba=512, data=bytearray(512)),
-                  Write(lba=1023, data=bytearray(512))]
+        writes = [Write(offset=512, data=bytearray(512)),
+                  Write(offset=1023, data=bytearray(512))]
 
         self.assertTrue(overlapping(writes))
 
     def test_overlapping_second_end(self):
-        writes = [Write(lba=512, data=bytearray(512)),
-                  Write(lba=0, data=bytearray(513))]
+        writes = [Write(offset=512, data=bytearray(512)),
+                  Write(offset=0, data=bytearray(513))]
 
         self.assertTrue(overlapping(writes))
 
     def test_overlapping_first_beginning(self):
-        writes = [Write(lba=1023, data=bytearray(512)),
-                  Write(lba=512, data=bytearray(512))]
+        writes = [Write(offset=1023, data=bytearray(512)),
+                  Write(offset=512, data=bytearray(512))]
 
         self.assertTrue(overlapping(writes))
 
     def test_overlapping_first_end(self):
-        writes = [Write(lba=0, data=bytearray(513)),
-                  Write(lba=512, data=bytearray(512))]
+        writes = [Write(offset=0, data=bytearray(513)),
+                  Write(offset=512, data=bytearray(512))]
 
         self.assertTrue(overlapping(writes))
 

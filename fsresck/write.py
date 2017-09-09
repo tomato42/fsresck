@@ -31,10 +31,10 @@ def overlapping(iterator):
 
     for i, write in enumerate(writes):
         for other_write in writes[i+1:]:
-            write_start = write.lba
-            write_end = write.lba + len(write.data)
-            other_write_start = other_write.lba
-            other_write_end = other_write.lba + len(other_write.data)
+            write_start = write.offset
+            write_end = write.offset + len(write.data)
+            other_write_start = other_write.offset
+            other_write_end = other_write.offset + len(other_write.data)
 
             if other_write_start < write_end < other_write_end:
                 return True
@@ -47,17 +47,17 @@ class Write(object):
 
     """Single image modification request."""
 
-    def __init__(self, lba, data, disk_id=None):
+    def __init__(self, offset, data, disk_id=None):
         """
         Create an object instance.
 
-        @type lba: int
-        @param lba: the start place for the write modification request
+        @type offset: int
+        @param offset: the start place for the write modification request
         @type data: bytearray
-        @param data: data to write at L{lba}
+        @param data: data to write at L{offset}
         @param disk_id: base image disk UUID
         """
-        self.lba = lba
+        self.offset = offset
         self.data = data
         self.disk_id = disk_id
         self.start_time = None
@@ -67,15 +67,15 @@ class Write(object):
         """Return human-readable representation of the object."""
         if self.disk_id is None and self.start_time is None and \
                 self.end_time is None:
-            return "<Write lba={0}, len(data)={1}>".format(
-                self.lba, len(self.data))
+            return "<Write offset={0}, len(data)={1}>".format(
+                self.offset, len(self.data))
         elif self.start_time is None and self.end_time is None:
-            return "<Write lba={0}, len(data)={1}, disk_id={2}>".format(
-                self.lba, len(self.data), self.disk_id)
+            return "<Write offset={0}, len(data)={1}, disk_id={2}>".format(
+                self.offset, len(self.data), self.disk_id)
         else:
-            return "<Write lba={0}, len(data)={1}, disk_id={2}, "\
+            return "<Write offset={0}, len(data)={1}, disk_id={2}, "\
                    "start_time={3}, end_time={4}>".format(
-                       self.lba, len(self.data), self.disk_id,
+                       self.offset, len(self.data), self.disk_id,
                        self.start_time, self.end_time)
 
     def set_times(self, start_time, end_time):

@@ -37,7 +37,7 @@ def main():
             for write in shuffled_writes:
 
                 with open(temp_image, "w+b") as image_file:
-                    image_file.seek(write.lba)
+                    image_file.seek(write.offset)
                     image_file.write(write.data)
 
                 test_image = utils.get_empty_image_name("/tmp")

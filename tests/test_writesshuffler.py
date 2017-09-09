@@ -52,7 +52,7 @@ class TestWritesShuffler(unittest.TestCase):
         # mock the object to not create an image copy
         image.create_image = lambda x: "/tmp/some-name"
         writes = [
-            Write(lba=0, data=bytearray(512)),
+            Write(offset=0, data=bytearray(512)),
             ]
 
         ws = WritesShuffler(image, writes)
@@ -66,7 +66,7 @@ class TestWritesShuffler(unittest.TestCase):
         image, writes = tests[1]
         self.assertEqual(image.image_name, "/tmp/some-name")
         self.assertEqual(image.writes, [])
-        self.assertEqual(writes, tuple([Write(lba=0, data=bytearray(512))]))
+        self.assertEqual(writes, tuple([Write(offset=0, data=bytearray(512))]))
 
     def test_generator_with_invalid_data(self):
         ws = WritesShuffler(None, [])
@@ -85,10 +85,10 @@ class TestWritesShuffler(unittest.TestCase):
         image.create_image = lambda x: "/tmp/some-name"
         # writes need to overlap to create permutations instead of combinations
         writes = [
-            Write(lba=0, data=bytearray(512)),
-            Write(lba=1, data=bytearray(512)),
-            Write(lba=2, data=bytearray(512)),
-            Write(lba=3, data=bytearray(512))
+            Write(offset=0, data=bytearray(512)),
+            Write(offset=1, data=bytearray(512)),
+            Write(offset=2, data=bytearray(512)),
+            Write(offset=3, data=bytearray(512))
             ]
 
         ws = WritesShuffler(image, writes)
@@ -213,10 +213,10 @@ class TestWritesShuffler(unittest.TestCase):
         # mock the object to not create an image copy
         image.create_image = lambda x: "/tmp/some-name"
         writes = [
-            Write(lba=0, data=bytearray(512)),
-            Write(lba=512, data=bytearray(512)),
-            Write(lba=1024, data=bytearray(512)),
-            Write(lba=1536, data=bytearray(512))
+            Write(offset=0, data=bytearray(512)),
+            Write(offset=512, data=bytearray(512)),
+            Write(offset=1024, data=bytearray(512)),
+            Write(offset=1536, data=bytearray(512))
             ]
 
         ws = WritesShuffler(image, writes)
@@ -323,9 +323,9 @@ class TestWritesShuffler(unittest.TestCase):
         image.create_image = mock.MagicMock(side_effect=dumb_create_image)
 
         writes = [
-            Write(lba=0, data=bytearray(1)),
-            Write(lba=1, data=bytearray(1)),
-            Write(lba=2, data=bytearray(1))
+            Write(offset=0, data=bytearray(1)),
+            Write(offset=1, data=bytearray(1)),
+            Write(offset=2, data=bytearray(1))
             ]
 
         ws = WritesShuffler(image, writes)
@@ -351,7 +351,7 @@ class TestWritesShuffler(unittest.TestCase):
         image = Image("/dev/null", [])
         image.create_image = mock.MagicMock(return_value="/test/some-name")
 
-        ws = WritesShuffler(image, [Write(lba=0, data=None)])
+        ws = WritesShuffler(image, [Write(offset=0, data=None)])
         ws.image_dir = "/test"
 
         test_image, test_writes = next(ws.generator())
@@ -367,9 +367,9 @@ class TestWritesShuffler(unittest.TestCase):
         image.create_image = lambda x: "/tmp/some-name"
 
         writes = [
-            Write(lba=0, data=bytearray(1)),
-            Write(lba=1, data=bytearray(1)),
-            Write(lba=2, data=bytearray(1)),
+            Write(offset=0, data=bytearray(1)),
+            Write(offset=1, data=bytearray(1)),
+            Write(offset=2, data=bytearray(1)),
             ]
         ws = WritesShuffler(image, writes)
 
@@ -384,8 +384,8 @@ class TestWritesShuffler(unittest.TestCase):
         image.create_image = lambda x: "/tmp/some-name"
 
         writes = [
-            Write(lba=0, data=bytearray(1)),
-            Write(lba=1, data=bytearray(1)),
+            Write(offset=0, data=bytearray(1)),
+            Write(offset=1, data=bytearray(1)),
             ]
         ws = WritesShuffler(image, writes)
 

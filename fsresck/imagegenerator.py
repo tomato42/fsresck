@@ -110,7 +110,7 @@ class LogReader(object):
 
                 data = self._read_exact(log, header.length)
 
-                write = Write(lba=header.offset, data=data)
+                write = Write(offset=header.offset, data=data)
                 write.set_times(header.start_time, header.end_time)
 
                 yield write

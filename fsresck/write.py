@@ -52,7 +52,7 @@ class Write(object):
         Create an object instance.
 
         @type lba: int
-        @param lab: the start place for the write modification request
+        @param lba: the start place for the write modification request
         @type data: bytearray
         @param data: data to write at L{lba}
         @param disk_id: base image disk UUID
@@ -87,7 +87,7 @@ class Write(object):
         """
         Check if objects are identical.
 
-        Compare the object with another to check if it representes the
+        Compare the object with another to check if it represents the
         same modification.
         """
         return (isinstance(other, Write) and

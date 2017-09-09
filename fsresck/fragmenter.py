@@ -48,9 +48,9 @@ class Fragmenter(object):
         """
         for write in writes:
             data = write.data
-            lba = write.lba
+            offset = write.offset
             while data:
-                ret = Write(lba, data[:self.sector_size])
-                lba += len(ret.data)
+                ret = Write(offset, data[:self.sector_size])
+                offset += len(ret.data)
                 data = data[self.sector_size:]
                 yield ret

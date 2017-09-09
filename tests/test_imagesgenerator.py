@@ -76,7 +76,7 @@ class TestBaseImageGenerator(unittest.TestCase):
         self.assertEqual(test_writes, [])
 
     def test_generate_with_one_write(self):
-        writes = [Write(lba=0, data=bytearray(10))]
+        writes = [Write(offset=0, data=bytearray(10))]
 
         patcher = mock.patch.object(LogReader,
                                     'reader',
@@ -102,8 +102,8 @@ class TestBaseImageGenerator(unittest.TestCase):
         self.assertEqual(test_writes, [])
 
     def test_generate_with_two_write(self):
-        writes = [Write(lba=0, data=bytearray(10)),
-                  Write(lba=512, data=bytearray(10))]
+        writes = [Write(offset=0, data=bytearray(10)),
+                  Write(offset=512, data=bytearray(10))]
 
         patcher = mock.patch.object(LogReader,
                                     'reader',
@@ -134,11 +134,11 @@ class TestBaseImageGenerator(unittest.TestCase):
         self.assertEqual(test_writes, [])
 
     def test_generate_with_five_writes(self):
-        writes = [Write(lba=0, data=bytearray(10)),
-                  Write(lba=512, data=bytearray(10)),
-                  Write(lba=1024, data=bytearray(10)),
-                  Write(lba=1536, data=bytearray(10)),
-                  Write(lba=2048, data=bytearray(10))]
+        writes = [Write(offset=0, data=bytearray(10)),
+                  Write(offset=512, data=bytearray(10)),
+                  Write(offset=1024, data=bytearray(10)),
+                  Write(offset=1536, data=bytearray(10)),
+                  Write(offset=2048, data=bytearray(10))]
 
         patcher = mock.patch.object(LogReader,
                                     'reader',
@@ -212,7 +212,7 @@ class TestLogReader(unittest.TestCase):
 
         writes = list(log_reader.reader())
 
-        write = Write(lba=0, data=bytearray(b'\x01'*10))
+        write = Write(offset=0, data=bytearray(b'\x01'*10))
         write.set_times(0.0, 0.0)
         self.assertEqual(writes, [write])
 

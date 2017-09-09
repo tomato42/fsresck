@@ -42,49 +42,49 @@ class TestFragmenter(unittest.TestCase):
         fragmenter = Fragmenter()
 
         writes = [
-            Write(lba=0, data=bytearray(512))
+            Write(offset=0, data=bytearray(512))
             ]
 
         ret = [i for i in fragmenter.fragment(writes)]
 
-        self.assertEqual([Write(lba=0, data=bytearray(512))],
+        self.assertEqual([Write(offset=0, data=bytearray(512))],
                          ret)
 
     def test_fragment_with_long_data(self):
         fragmenter = Fragmenter()
 
         writes = [
-            Write(lba=0, data=bytearray(1024))
+            Write(offset=0, data=bytearray(1024))
             ]
 
         ret = [i for i in fragmenter.fragment(writes)]
 
         self.assertEqual(len(ret), 2)
         self.assertEqual(len(ret[0].data), 512)
-        self.assertEqual(ret[0].lba, 0)
+        self.assertEqual(ret[0].offset, 0)
         self.assertEqual(len(ret[1].data), 512)
-        self.assertEqual(ret[1].lba, 512)
+        self.assertEqual(ret[1].offset, 512)
 
     def test_fragment_with_non_aligned_data(self):
         fragmenter = Fragmenter()
 
         writes = [
-            Write(lba=0, data=bytearray(1022))
+            Write(offset=0, data=bytearray(1022))
             ]
 
         ret = [i for i in fragmenter.fragment(writes)]
 
         self.assertEqual(len(ret), 2)
         self.assertEqual(ret[0].data, bytearray(512))
-        self.assertEqual(ret[0].lba, 0)
+        self.assertEqual(ret[0].offset, 0)
         self.assertEqual(ret[1].data, bytearray(510))
-        self.assertEqual(ret[1].lba, 512)
+        self.assertEqual(ret[1].offset, 512)
 
     def test_fragment_with_non_standard_sector_size(self):
         fragmenter = Fragmenter(sector_size=1)
 
         writes = [
-            Write(lba=0, data=bytearray(10))
+            Write(offset=0, data=bytearray(10))
             ]
 
         ret = [i for i in fragmenter.fragment(writes)]
@@ -93,14 +93,14 @@ class TestFragmenter(unittest.TestCase):
         for write in fragmenter.fragment(writes):
             self.assertEqual(bytearray(1), write.data)
 
-        self.assertEqual(9, ret[9].lba)
+        self.assertEqual(9, ret[9].offset)
 
     def test_fragment_with_multiple_writes(self):
         fragmenter = Fragmenter()
 
         writes = [
-            Write(lba=0, data=bytearray(1024)),
-            Write(lba=65536, data=bytearray(2))
+            Write(offset=0, data=bytearray(1024)),
+            Write(offset=65536, data=bytearray(2))
             ]
 
         ret = [i for i in fragmenter.fragment(writes)]

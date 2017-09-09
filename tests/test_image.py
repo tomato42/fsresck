@@ -57,21 +57,21 @@ class TestImage(unittest.TestCase):
         self.assertIsNotNone(image)
 
     def test___repr__(self):
-        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+        image = Image("/tmp/test.1", [Write(offset=4, data='aa')])
 
         self.assertEqual("Image(image_name='/tmp/test.1', "\
-                         "writes=[<Write lba=4, "\
+                         "writes=[<Write offset=4, "\
                          "len(data)=2>])", repr(image))
 
     def test___repr___adter_create_image(self):
-        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+        image = Image("/tmp/test.1", [Write(offset=4, data='aa')])
         image.temp_image_name = '/tmp/test.2'
 
         self.assertEqual("Image(image_name='/tmp/test.2', writes=[])",
                          repr(image))
 
     def test_create_image_and_cleanup(self):
-        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+        image = Image("/tmp/test.1", [Write(offset=4, data='aa')])
 
         # mock setup
         patcher = mock.patch.object(builtins,
@@ -144,7 +144,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_unlink.call_args, mock.call('/tmp/fsresck.xxxx'))
 
     def test_create_image_with_failed_copy(self):
-        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+        image = Image("/tmp/test.1", [Write(offset=4, data='aa')])
 
         # mock setup
         patcher = mock.patch.object(builtins,
@@ -205,7 +205,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_unlink.call_count, 0)
 
     def test_create_image_twice(self):
-        image = Image("/tmp/test.1", [Write(lba=4, data='aa')])
+        image = Image("/tmp/test.1", [Write(offset=4, data='aa')])
 
         # mock setup
         patcher = mock.patch.object(builtins,

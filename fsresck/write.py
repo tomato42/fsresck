@@ -79,7 +79,7 @@ class Write(object):
                        self.start_time, self.end_time)
 
     def set_times(self, start_time, end_time):
-        """Add the issuence time and completion time of original operation."""
+        """Add the issuance time and completion time of original operation."""
         self.start_time = start_time
         self.end_time = end_time
 

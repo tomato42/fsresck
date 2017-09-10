@@ -77,7 +77,7 @@ class Image(object):
         Remove temporary image file.
 
         Remove the temporary image name, make it possible to create a new
-        temporary copy with appplied writes
+        temporary copy with applied writes
         """
         os.unlink(self.temp_image_name)
         self.temp_image_name = None

@@ -28,7 +28,8 @@
 from .image import Image
 
 import random
-from itertools import permutations, combinations
+from itertools import permutations, islice
+from collections import deque
 
 from .write import overlapping
 
@@ -71,48 +72,76 @@ class WritesShuffler(object):
                 continue
             yield (Image(image, []), writes)
 
-    def generator(self, group_size=3, comb_size=5):
+    def generator(self, group_size=3):
         """
         Return all permutations of writes on an image.
 
         Iterator that returns pairs of images and logs of writes that are
-        shuffled in a way that makes them unique.
+        shuffled in a way that makes them unique. Takes into account if the
+        writes are overlapping.
 
         The group_size specifies how big the permutation group will be, where
         the group is a set of last written blocks to image.
-
-        The comb_size specifies the size of set for drawing elements for
-        combinations of writes. This is the fallback mechanism if it turns
-        out that all the permutations would be equivalent - produce the same
-        image on output
         """
         if self.base_image is None:
             raise TypeError("base_image can't be None")
-        self.writes = list(self.writes)
-
+        if self.writes is None:
+            raise TypeError("writes can't be None")
         image = self.base_image.create_image(self.image_dir)
 
-        for i in range(group_size):
-            draw_group = self.writes[:group_size]
-            if overlapping(draw_group):
-                for perm in permutations(draw_group, i):
-                    yield (Image(image, []), perm)
-            else:
-                for comb in combinations(self.writes[:comb_size], i):
-                    yield (Image(image, []), comb)
+        # process writes in memory efficient way
+        iter_writes = iter(self.writes)
+        writes = deque(islice(iter_writes, group_size))
+        base_writes = list()
 
-        for j, base in enumerate(self.writes[:i] for i in
-                                 range(max(0,
-                                           len(self.writes) -
-                                           group_size + 1))):
-            draw_group = self.writes[j:j+group_size]
-            if overlapping(draw_group):
-                for perm in permutations(draw_group):
-                    yield (Image(image, base), perm)
-            else:
-                for comb in combinations(self.writes[j:j+comb_size],
-                                         group_size):
-                    yield (Image(image, base), comb)
+        new_write = True
+        while True:
+            # first return the base image with writes in order
+            yield (Image(image, list(base_writes)), tuple())
+            existing_lists = set()
+            existing_sets = set()
+            # slice the permutations so that we get partial non-in-order writes
+            for draw_group in (i[:l] for i in permutations(writes)
+                    for l in range(1, group_size+1)):
+                # make sure we do not return the same list of writes
+                # as we are slicing the tuples returned by permutations()
+                # so for large group sizes there would be a lot of duplication
+                if draw_group in existing_lists:
+                    continue
+                existing_lists.add(draw_group)
+                # if the writes are in-order, skip them as they will be
+                # returned as a base image
+                if writes and writes[0] == draw_group[0]:
+                    continue
+                # if the writes overlap then the order matters so return them
+                if overlapping(draw_group):
+                    yield (Image(image, list(base_writes)), draw_group)
+                else:
+                    # if they don't overlap, then order doesn't matter
+                    # so don't return duplicates of such lists
+                    if set(draw_group) in existing_sets:
+                        continue
+                    existing_sets.add(frozenset(draw_group))
+                    # that also means that we should skip ones that are just
+                    # permutation of the first few writes as those will be
+                    # returned as base image
+                    if set(draw_group) == set(islice(writes, len(draw_group))):
+                        continue
+                    # or ones that include the first element (as this has the
+                    # same effect as an in-order set of writes for overlapping)
+                    if writes and writes[0] in draw_group:
+                        continue
+                    yield (Image(image, list(base_writes)), draw_group)
+
+            if not writes:
+                break
+            # move the first ordered write to base image, get new one to
+            # permutations, if available
+            base_writes.append(writes.popleft())
+            new_write = next(iter_writes, None)
+            if new_write:
+                writes.append(new_write)
+            # TODO fold down base image when base_writes grows very large?
 
     def cleanup(self):
         """Remove the temporary image created by generator and shuffle."""

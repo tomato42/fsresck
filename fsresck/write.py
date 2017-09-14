@@ -63,6 +63,11 @@ class Write(object):
         self.start_time = None
         self.end_time = None
 
+    def __hash__(self):
+        """Return the hash of the object."""
+        return hash((self.offset, bytes(self.data), self.disk_id,
+                     self.start_time, self.end_time))
+
     def __repr__(self):
         """Return human-readable representation of the object."""
         if self.disk_id is None and self.start_time is None and \

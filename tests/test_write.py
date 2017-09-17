@@ -130,3 +130,14 @@ class TestOverlapping(unittest.TestCase):
 
         self.assertTrue(overlapping(writes))
 
+    def test_overlapping_different_disks(self):
+        writes = [Write(0, bytearray(512), disk_id=1),
+                  Write(0, bytearray(512), disk_id=2)]
+
+        self.assertFalse(overlapping(writes))
+
+    def test_non_overlapping_different_disks(self):
+        writes = [Write(0, bytearray(512), disk_id=1),
+                  Write(512, bytearray(512), disk_id=2)]
+
+        self.assertFalse(overlapping(writes))

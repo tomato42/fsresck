@@ -31,6 +31,10 @@ def overlapping(iterator):
 
     for i, write in enumerate(writes):
         for other_write in writes[i+1:]:
+            # when writes targets different disk, it inherently does not
+            # overlap
+            if write.disk_id != other_write.disk_id:
+                continue
             write_start = write.offset
             write_end = write.offset + len(write.data)
             other_write_start = other_write.offset

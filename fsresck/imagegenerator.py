@@ -40,20 +40,20 @@ class LogHeader(object):
 
     Reads the following fields in big-endian format:
     32bit unsigned int - operation type (only "1" supported - write),
-    double precision floating point number - start time in seconds from epoch,
-    double precision floating point number - end time in seconds from epoch,
+    64bit unsigned int - start time in nanoseconds from epoch,
+    64bit unsigned int - end time in nanoseconds from epoch,
     64bit unsigned integer - disk offset in bytes
     32bit unsigned integer - length of data payload
     """
 
-    header_format = '!IddQi'
+    header_format = '!IQQQi'
     header_length = struct.calcsize(header_format)
 
     def __init__(self):
         """Create object."""
         self.operation = 0
-        self.start_time = 0.0
-        self.end_time = 0.0
+        self.start_time = 0
+        self.end_time = 0
         self.offset = 0
         self.length = 0
 

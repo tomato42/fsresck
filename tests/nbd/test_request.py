@@ -47,7 +47,7 @@ class TestError(unittest.TestCase):
         with self.assertRaises(Error) as exception:
             raise Error('test')
 
-        self.assertEqual(repr(exception.exception), "request.Error('test',)")
+        self.assertIn("request.Error('test'", repr(exception.exception))
 
 
 class TestNBDRequest(unittest.TestCase):

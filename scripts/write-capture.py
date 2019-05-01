@@ -74,6 +74,9 @@ def pread(h, count, offset):
 
 def pwrite(h, buf, offset):
     global disk
+    # we need a timer that is consistent between processes
+    # so that we know which writes happen in what order in multi-device
+    # tests
     start = time.clock_gettime_ns(time.CLOCK_REALTIME)
     disk.seek(offset, os.SEEK_SET)
     disk.write(buf)

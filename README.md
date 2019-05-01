@@ -42,16 +42,18 @@ a file with different state is prepared and the process continues.
 Algorithm
 =========
 
-Because any single write can be comprise of multiple sectors (it's not uncommon
-to write a full page (4KiB) at a time), the generation of images can work
-in two main modes - write mode, where the atomic operation is a single write
-or block mode, where the atomic operation is a single sector.
+Because any single write can be comprised of multiple sectors (it's not
+uncommon to write a full page (4KiB) at a time), the generation of images can
+work in two main modes - write mode, where the atomic operation is a single
+write or block mode, where the atomic operation is a single sector.
 
 First step is to prepare a base image, that is done by taking the original
 image, and replying the log up to specific point in time. Few reads past that
 point are taken and permutated in order. That permutation is then written
 write by write and tested, but only if it would not cause testing the same
 permutation multiple times.
+
+Let's analyse situation for 3 writes that do not overlap (0, 1 and 2):
 
 Full list of permutations of three element list would look like this:
 ```

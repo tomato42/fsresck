@@ -121,7 +121,7 @@ class TestImage(unittest.TestCase):
         # mock asserts
         self.assertEqual(mock_open.call_count, 1)
         self.assertEqual(mock_open.call_args, mock.call('/tmp/fsresck.xxxx',
-                                                        'w+b'))
+                                                        'r+b'))
         handle = mock_open()
         self.assertEqual(handle.seek.call_args, mock.call(4))
         self.assertEqual(handle.write.call_args, mock.call('aa'))
@@ -254,7 +254,7 @@ class TestImage(unittest.TestCase):
         # mock asserts
         self.assertEqual(mock_open.call_count, 1)
         self.assertEqual(mock_open.call_args, mock.call('/tmp/fsresck.xxxx',
-                                                        'w+b'))
+                                                        'r+b'))
         handle = mock_open()
         self.assertEqual(handle.seek.call_args, mock.call(4))
         self.assertEqual(handle.write.call_args, mock.call('aa'))
@@ -303,7 +303,7 @@ class TestImage(unittest.TestCase):
         # the second run is to get "handle"
         self.assertEqual(mock_open.call_count, 1)
         self.assertEqual(mock_open.call_args, mock.call('/tmp/fsresck.yyyy',
-                                                        'w+b'))
+                                                        'r+b'))
         handle = mock_open()
         self.assertEqual(handle.seek.call_args, mock.call(4))
         self.assertEqual(handle.write.call_args, mock.call('aa'))

@@ -98,7 +98,7 @@ class LogReader(object):
 
     def reader(self):
         """Generator for reads in file."""
-        with open(self.log_name, 'r+b') as log:
+        with open(self.log_name, 'rb') as log:
             while True:
                 try:
                     header_data = self._read_exact(log,

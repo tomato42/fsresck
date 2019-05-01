@@ -65,7 +65,7 @@ class Image(object):
             utils.copy(self.image_name, self.temp_image_name)
 
             # apply writes to the copied image
-            with open(self.temp_image_name, "w+b") as image:
+            with open(self.temp_image_name, "r+b") as image:
                 for write in self.writes:
                     image.seek(write.offset)
                     image.write(write.data)

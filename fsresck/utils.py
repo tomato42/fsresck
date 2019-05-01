@@ -36,7 +36,7 @@ def copy(source, destination):
     """
     # we want the copy to be CoW aware and preserve sparse locations
     # so we need to use the native cp command
-    ret = subprocess.call(['cp', '--reflink=auto', '--sparse=always',
+    ret = subprocess.call(['cp', '--reflink=auto', '--sparse=auto',
                            source, destination])
     if ret != 0:
         raise FSCopyError("File copy failed, error {0}".format(ret))

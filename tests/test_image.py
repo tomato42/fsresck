@@ -136,7 +136,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_call.call_count, 1)
         self.assertEqual(mock_call.call_args, mock.call(['cp',
                                                          '--reflink=auto',
-                                                         '--sparse=always',
+                                                         '--sparse=auto',
                                                          '/tmp/test.1',
                                                          '/tmp/fsresck.xxxx']))
 
@@ -198,7 +198,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_call.call_count, 1)
         self.assertEqual(mock_call.call_args, mock.call(['cp',
                                                          '--reflink=auto',
-                                                         '--sparse=always',
+                                                         '--sparse=auto',
                                                          '/tmp/test.1',
                                                          '/tmp/fsresck.xxxx']))
 
@@ -269,7 +269,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_call.call_count, 1)
         self.assertEqual(mock_call.call_args, mock.call(['cp',
                                                          '--reflink=auto',
-                                                         '--sparse=always',
+                                                         '--sparse=auto',
                                                          '/tmp/test.1',
                                                          '/tmp/fsresck.xxxx']))
 
@@ -318,7 +318,7 @@ class TestImage(unittest.TestCase):
         self.assertEqual(mock_call.call_count, 1)
         self.assertEqual(mock_call.call_args, mock.call(['cp',
                                                          '--reflink=auto',
-                                                         '--sparse=always',
+                                                         '--sparse=auto',
                                                          '/tmp/test.1',
                                                          '/tmp/fsresck.yyyy']))
 
